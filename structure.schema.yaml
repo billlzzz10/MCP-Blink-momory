@@ -1,0 +1,18 @@
+﻿required_folders:
+  - modules/memory_graph
+  - modules/embedding_service
+  - modules/auto_tag_service
+  - modules/memory0_service
+  - config
+  - memory
+  - docs
+  - .github
+
+required_files:
+  - manifest.yaml
+  - config/access_policy.yaml
+  - memory/memory_store.json
+  - memory/lineage_log.json
+  - docs/audit_log.md
+  - docs/legacy_clues.md
+  - docs/changelog.md

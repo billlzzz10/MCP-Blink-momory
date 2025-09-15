@@ -1,0 +1,8 @@
+﻿read_only:
+  - docs/
+  - memory/lineage_log.json
+
+forbidden:
+  - __pycache__/
+  - node_modules/
+  - .git/

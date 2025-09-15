@@ -1,0 +1,13 @@
+﻿system_name: "Explicit Agent Protocol with KG Memory"
+version: "1.0.0"
+modules:
+  - name: memory_graph
+    purpose: "เธเธฑเธ”เธเธฒเธฃเธเธงเธฒเธกเธเธณเนเธเธเธเธฃเธฒเธ"
+  - name: embedding_service
+    purpose: "เธเธฑเธ embedding เธชเธณเธซเธฃเธฑเธ semantic search"
+  - name: auto_tag_service
+    purpose: "เธ•เธดเธ”เนเธ—เนเธเธเธงเธฒเธกเธเธณเธญเธฑเธ•เนเธเธกเธฑเธ•เธด"
+  - name: memory0_service
+    purpose: "เธเธฑเธ”เธเธฒเธฃ root memory node"
+entry_point: "index.js"
+audit_ready: true
