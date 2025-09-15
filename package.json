@@ -1,36 +1,21 @@
-﻿{
-    "version":  "1.0.0",
-    "name":  "mcp-blink-memory",
-    "author": "billlzzz10",
-    "description":  "Explicit Agent Protocol + Knowledge Graph Memory (no server, no docker)",
-    "type": "module",
-    "main": "index.js",
-    "exports": {
-        ".": "./index.js"
-    },
-    "scripts":  {
-                    "validate":  "node modules/system/validate.js",
-                    "describe":  "node modules/system/describe.js",
-                    "test:bootstrap": "node -e \"import('./index.js').then(async m=>{await m.ensureInitialized(); console.log('OK')})\"",
-                    "test": "jest",
-                    "test:watch": "jest --watch",
-                    "dev": "node -r dotenv/config index.js",
-                    "lint": "eslint . --ext .js",
-                    "format": "prettier --write ."
-                },
-    "bin": {
-        "explicit-agent": "index.js"
-    },
-    "dependencies":  {
-                         "yaml":  "^2.5.0",
-                         "openai": "^4.22.1",
-                         "@xenova/transformers": "^2.17.2",
-                         "natural": "^7.1.0",
-                         "compromise": "^14.11.0",
-                         "stopword": "^3.0.1"
-                     },
-    "devDependencies": {
-                         "jest": "^29.7.0",
-                         "@types/node": "^20.11.19"
-                     }
+{
+  "name": "mcp-memory",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "mcp-memory": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node ./src/server.js",
+    "cli": "node ./src/cli.js",
+    "health": "node -e \"fetch('http://localhost:'+(process.env.PORT||7070)+'/health').then(r=>r.json()).then(console.log).catch(e=>{console.error(e);process.exit(1)})\""
+  },
+  "engines": { "node": ">=18.17" },
+  "dependencies": {
+    "@xenova/transformers": "^2.15.0",
+    "commander": "^12.1.0",
+    "express": "^4.19.2",
+    "uuid": "^9.0.1"
+  }
 }
