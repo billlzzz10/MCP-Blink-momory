@@ -421,6 +421,31 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 4. **Analytics Dashboard** - Graph visualization
 5. **Multi-agent Support** - Agent collaboration features
 
+## Use with ChatGPT Developer Mode (MCP)
+
+1. Run Node backend:
+   ```bash
+   npm i
+   npx mcp-memory run --port 7070
+   ```
+
+2. Run MCP bridge:
+
+   ```bash
+   cd mcp
+   pip install -r requirements.txt
+   BASE_URL=http://localhost:7070 DEFAULT_COLLECTION=notes python server.py
+   ```
+
+   MCP SSE URL: `http://localhost:8000/sse/`
+
+3. In ChatGPT → Settings → Connectors → Developer mode → Add server:
+
+   * Label: `mcp-memory`
+   * URL: `http://localhost:8000/sse/`
+   * Allowed tools: `search`, `fetch`
+   * Approval: `never`
+
 ---
 
 **Explicit Agent Protocol + KG Memory** - Building transparent, auditable AI memory systems for the future.

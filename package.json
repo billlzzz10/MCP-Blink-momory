@@ -9,6 +9,7 @@
   "scripts": {
     "start": "node ./src/server.js",
     "cli": "node ./src/cli.js",
+    "dev": "node ./src/server.js",
     "health": "node -e \"fetch('http://localhost:'+(process.env.PORT||7070)+'/health').then(r=>r.json()).then(console.log).catch(e=>{console.error(e);process.exit(1)})\""
   },
   "engines": { "node": ">=18.17" },
