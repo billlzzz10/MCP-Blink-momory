@@ -10,8 +10,8 @@
     "start": "node ./src/server.js",
     "cli": "node ./src/cli.js",
     "health": "node -e \"fetch('http://localhost:'+(process.env.PORT||7070)+'/health').then(r=>r.json()).then(console.log).catch(e=>{console.error(e);process.exit(1)})\"",
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "lint": "eslint .",
     "package": "node esbuild.config.js"
   },

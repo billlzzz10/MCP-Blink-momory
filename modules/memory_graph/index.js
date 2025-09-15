@@ -145,11 +145,12 @@ async function persistStore() {
 export async function createEntities(entities) {
   const newEntities = [];
   for (const entityData of entities) {
-    if (!entityData.name || !entityData.type) {
-      console.warn('Skipping entity with missing name or type:', entityData);
+    // Validation based on the new spec
+    if (!entityData.type || !entityData.scope || (!entityData.text && !entityData.rich)) {
+      console.warn('Skipping entity with missing required fields (type, scope, text/rich):', entityData);
       continue;
     }
-    const id = `ent_${crypto.randomBytes(8).toString('hex')}`;
+    const id = entityData.id || `ent_${crypto.randomBytes(8).toString('hex')}`;
     const newEntity = {
       id,
       ...entityData,
@@ -432,7 +433,7 @@ export async function semanticSearch(query, options = {}) {
   return finalResults;
 }
 
-async function bm25Search(query, options) {
+async function bm25Search(query) {
     if (!bm25Index) {
         console.warn("⚠️ BM25 Index not built.");
         return [];
@@ -447,6 +448,14 @@ async function bm25Search(query, options) {
         observation: res.doc.content,
         search_method: 'bm25'
     }));
+}
+
+function applyTagFilter(entity, filterSet) {
+    if (filterSet.size === 0) {
+        return true; // No filter, always pass
+    }
+    const entityTags = new Set(entity.autoTags || []);
+    return [...filterSet].some(tag => entityTags.has(tag));
 }
 
 async function vectorSearch(queryVector, options) {
@@ -477,23 +486,19 @@ async function vectorSearch(queryVector, options) {
     const results = [];
     for (const obsVector of candidateVectors) {
         const similarity = cosineSimilarity(queryVector, obsVector.vector);
-        if (similarity >= threshold) {
-            const entity = graphCache.entityMap.get(obsVector.entityName);
-            if (!entity) continue;
+        if (similarity < threshold) continue;
 
-            if (filterSet.size > 0) {
-                const entityTags = new Set(entity.autoTags || []);
-                const hasMatchingTag = [...filterSet].some(tag => filterSet.has(tag));
-                if (!hasMatchingTag) continue;
-            }
+        const entity = graphCache.entityMap.get(obsVector.entityName);
+        if (!entity) continue;
 
-            results.push({
-                entity,
-                similarity: similarity,
-                observation: obsVector.content,
-                search_method: 'vector'
-            });
-        }
+        if (!applyTagFilter(entity, filterSet)) continue;
+
+        results.push({
+            entity,
+            similarity: similarity,
+            observation: obsVector.content,
+            search_method: 'vector'
+        });
     }
     return results;
 }
@@ -503,7 +508,7 @@ export async function getAllTags() {
 }
 
 export async function searchByTag(tag, options = {}) {
-  const { exact = false, limit = 50 } = options;
+  const { limit = 50 } = options;
   const results = [];
   const entityNames = graphCache.tags.get(tag) || [];
   for (let i = 0; i < Math.min(entityNames.length, limit); i++) {

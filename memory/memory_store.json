@@ -1,1 +1,23 @@
-﻿[]
+[
+  {
+    "id": "ent_bbb64ad999ffe38c",
+    "type": "note",
+    "scope": "document",
+    "text": "This is a test note about hybrid search and BM25.",
+    "docHash": "doc_hash_123",
+    "tags": [
+      "testing",
+      "api"
+    ],
+    "createdAt": "2025-09-15T17:40:48.625Z",
+    "updatedAt": "2025-09-15T17:40:48.625Z"
+  },
+  {
+    "id": "ent_267fe69d581977d0",
+    "type": "note",
+    "scope": "document",
+    "text": "Another item for searching.",
+    "createdAt": "2025-09-15T17:40:48.644Z",
+    "updatedAt": "2025-09-15T17:40:48.644Z"
+  }
+]

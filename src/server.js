@@ -55,8 +55,7 @@ app.post('/memory/search', async (req, res) => {
     if (!query) {
       return res.status(400).json({ ok: false, error: 'Missing required field: query' });
     }
-    // This will be enhanced to do hybrid search later
-    const results = await MemoryGraph.semanticSearch(query, { topK, filters });
+    const results = await MemoryGraph.semanticSearch(query, { topK, filters, hybrid });
     res.json({ ok: true, results });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
@@ -130,4 +129,8 @@ app.post('/stats/query', async (req, res) => {
 const port = process.env.PORT ? Number(process.env.PORT) : (config.server?.port || 7070);
 app.listen(port, () => {
   console.log(`[mcp-memory] server listening on http://localhost:${port}`);
+  // For integration testing, signal that the server is ready
+  if (process.send) {
+    process.send('listening');
+  }
 });

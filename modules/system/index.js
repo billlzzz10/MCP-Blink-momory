@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import yaml from 'js-yaml';
+import yaml, { FAILSAFE_SCHEMA } from 'js-yaml';
 
 const REQUIRED_DIRS = ['memory', 'modules', 'config'];
 const REQUIRED_FILES = ['package.json', 'manifest.yaml', 'index.js'];
@@ -13,7 +13,7 @@ export async function selfDescribe() {
   const manifestPath = path.join(process.cwd(), 'manifest.yaml');
   try {
     const fileContents = await fs.readFile(manifestPath, 'utf8');
-    const manifest = yaml.load(fileContents);
+    const manifest = yaml.load(fileContents, { schema: FAILSAFE_SCHEMA });
     return {
       system_name: manifest.system_name,
       version: manifest.version,

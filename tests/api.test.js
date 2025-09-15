@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { fork } from 'child_process';
-import { jest } from '@jest/globals';
+import { jest, describe, test, beforeAll, afterAll, expect } from '@jest/globals';
 
 const PORT = 7071; // Use a different port for testing
 const BASE_URL = `http://localhost:${PORT}`;
@@ -13,12 +13,13 @@ beforeAll((done) => {
     silent: true, // Suppress child process console output
   });
 
-  // Wait for the server to be ready. A better way would be to have the server send a message.
-  setTimeout(() => {
-    console.log("Server starting for tests...");
-    done();
-   }, 5000);
-});
+  serverProcess.on('message', (message) => {
+    if (message === 'listening') {
+      console.log("Test server is listening.");
+      done();
+    }
+  });
+}, 60000); // 60 second timeout for beforeAll
 
 afterAll(() => {
   if (serverProcess) {
