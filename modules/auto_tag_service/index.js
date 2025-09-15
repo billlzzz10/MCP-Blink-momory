@@ -327,49 +327,53 @@ async function advancedTagging(text, entityName) {
   }
 }
 
-// 🎯 ML-based tagging - ใช้ machine learning model (mock)
+import { pipeline } from '@xenova/transformers';
+
+let classifier = null;
+
+// 🎯 ML-based tagging - ใช้ machine learning model (REAL IMPLEMENTATION)
 async function mlTagging(text, entityName) {
-  console.log(`🤖 ML-based tagging สำหรับ "${entityName}" (mock implementation)`);
-  
-  // Mock ML model - ใน production จะใช้ trained classifier
-  const mockModel = {
-    keywords: ['technology', 'ai', 'machine learning', 'data', 'system', 'network'],
-    thaiKeywords: ['เทคโนโลยี', 'ปัญญาประดิษฐ์', 'การเรียนรู้ของเครื่อง', 'ข้อมูล', 'ระบบ'],
-    categories: ['tech', 'business', 'science', 'health']
-  };
-  
-  // Basic keyword extraction
-  const basicTags = basicKeywordExtraction(text, entityName);
-  
-  // Mock ML predictions
-  const mlPredictions = basicTags.tags
-    .map(tag => {
-      // Mock probability calculation
-      const isTech = mockModel.keywords.some(kw => tag.includes(kw)) || 
-                     mockModel.thaiKeywords.some(kw => tag.includes(kw));
-      
-      const confidence = isTech ? 0.85 + Math.random() * 0.15 : 0.4 + Math.random() * 0.3;
-      
-      return {
-        tag,
-        category: isTech ? 'tech' : 'general',
-        confidence: Math.min(confidence, 1.0)
-      };
-    })
-    .filter(pred => pred.confidence >= CONFIG.confidenceThreshold)
-    .sort((a, b) => b.confidence - a.confidence)
-    .slice(0, CONFIG.maxTagsPerEntity);
-  
-  const finalTags = mlPredictions.map(pred => pred.tag);
-  const avgConfidence = mlPredictions.reduce((sum, pred) => sum + pred.confidence, 0) / mlPredictions.length;
-  
-  return {
-    tags: finalTags,
-    confidence: avgConfidence,
-    source: 'ml_model',
-    predictions: mlPredictions.length,
-    model: 'mock-v1.0'
-  };
+  console.log(`🤖 ML-based tagging for "${entityName}" (using @xenova/transformers)`);
+
+  // Initialize the pipeline on first use
+  if (!classifier) {
+    console.log("🤖 Initializing zero-shot classification pipeline...");
+    classifier = await pipeline('zero-shot-classification', 'Xenova/bart-large-mnli');
+    console.log("✅ Pipeline initialized.");
+  }
+
+  // Define candidate labels for classification
+  const candidateLabels = ['technology', 'business', 'science', 'health', 'art', 'politics', 'sports', 'education', 'engineering', 'software', 'AI', 'machine learning'];
+
+  try {
+    const output = await classifier(text, candidateLabels);
+
+    const mlPredictions = output.labels.map((label, i) => ({
+      tag: label,
+      confidence: output.scores[i]
+    }));
+
+    const filtered = mlPredictions
+      .filter(pred => pred.confidence >= CONFIG.confidenceThreshold)
+      .sort((a, b) => b.confidence - a.confidence)
+      .slice(0, CONFIG.maxTagsPerEntity);
+
+    const finalTags = filtered.map(pred => pred.tag);
+    const avgConfidence = filtered.reduce((sum, pred) => sum + pred.confidence, 0) / (filtered.length || 1);
+
+    return {
+      tags: finalTags,
+      confidence: avgConfidence,
+      source: 'ml_model',
+      predictions: filtered.length,
+      model: 'Xenova/bart-large-mnli'
+    };
+
+  } catch (error) {
+    console.error(`❌ Error during ML tagging for "${entityName}":`, error);
+    // Fallback to basic tagging in case of error
+    return basicKeywordExtraction(text, entityName);
+  }
 }
 
 // 🔍 Helper: Extract noun phrases (mock)
@@ -693,11 +697,3 @@ export async function healthCheck() {
 }
 
 // 🔌 Export main API
-export {
-  initialize,
-  autoTagOnObservations,
-  searchByTags,
-  clearCache,
-  getStats,
-  healthCheck
-};

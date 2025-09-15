@@ -502,12 +502,3 @@ export async function healthCheck() {
 }
 
 // 🔌 Export main API
-export {
-  initialize,
-  embedTexts,
-  normalizeVector,
-  cosineSimilarity,
-  clearCache,
-  getCacheStats,
-  healthCheck
-};
