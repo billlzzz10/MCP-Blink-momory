@@ -65,7 +65,10 @@ export function query(collection, queryText, k = 5) {
     text: it.text,
     metadata: it.metadata,
     score: cosine(qv, it.vec)
-  })).sort((a, b) => b.score - a.score).slice(0, k);
+  }))
+    .filter(x => Number.isFinite(x.score))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, k);
   return scored;
 }
 

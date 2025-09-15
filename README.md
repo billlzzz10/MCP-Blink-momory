@@ -443,10 +443,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
    * Label: `mcp-memory`
    * URL: `http://localhost:8000/sse/`
-   * Allowed tools: `search`, `fetch`
-   * Approval: `never`
+  * Allowed tools: `search`, `fetch`
+  * Approval: `never`
 
 ---
+
+### Security notes
+
+- By default the bridge binds to `0.0.0.0`; set `HOST=127.0.0.1` to keep it local.
+- JSON payloads are capped at 1 MB and individual documents at ~50 kB.
+- Only text payloads are accepted; binary data is rejected.
+
 
 **Explicit Agent Protocol + KG Memory** - Building transparent, auditable AI memory systems for the future.
 

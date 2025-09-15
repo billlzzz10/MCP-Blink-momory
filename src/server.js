@@ -1,6 +1,13 @@
 import express from 'express';
 import { config } from './config.js';
-import { upsert, query, stats, listCollections, removeCollection, getById } from './vectorStore.js';
+import {
+  upsert as vsUpsert,
+  query as vsQuery,
+  stats as vsStats,
+  listCollections,
+  removeCollection,
+  getById
+} from './vectorStore.js';
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
@@ -12,7 +19,13 @@ app.get('/health', (req, res) => {
 app.post('/upsert', (req, res) => {
   try {
     const { collection, items } = req.body;
-    const result = upsert(collection, items);
+    if (!collection || !Array.isArray(items) || !items.length) {
+      throw new Error('collection and items required');
+    }
+    if (items.some(it => (it.text || '').length > 50_000)) {
+      throw new Error('item too large');
+    }
+    const result = vsUpsert(collection, items);
     res.json({ ok: true, result });
   } catch (e) {
     res.status(400).json({ ok: false, error: e.message });
@@ -21,8 +34,10 @@ app.post('/upsert', (req, res) => {
 
 app.post('/query', (req, res) => {
   try {
-    const { collection, query: q, k } = req.body;
-    const result = query(collection, q, k);
+    const { collection, query: q, k = 5 } = req.body;
+    if (!collection || !q) throw new Error('collection and query required');
+    if (String(q).length > 5_000) throw new Error('query too long');
+    const result = vsQuery(collection, q, k);
     res.json({ ok: true, result });
   } catch (e) {
     res.status(400).json({ ok: false, error: e.message });
@@ -32,7 +47,7 @@ app.post('/query', (req, res) => {
 app.get('/stats', (req, res) => {
   try {
     const { collection } = req.query;
-    const result = stats(collection);
+    const result = vsStats(collection);
     res.json({ ok: true, stats: result });
   } catch (e) {
     res.status(400).json({ ok: false, error: e.message });
