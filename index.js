@@ -3,59 +3,11 @@
 import * as MemoryGraph from "./modules/memory_graph/index.js";
 import * as Memory0 from "./modules/memory0_service/index.js";
 import * as System from "./modules/system/index.js";
+import * as Embedding from "./modules/embedding_service/index.js";
+import * as AutoTag from "./modules/auto_tag_service/index.js";
+import * as WorkflowEngine from "./modules/workflow_engine/index.js";
 import fs from 'fs/promises';
 import path from 'path';
-
-// Mock implementations for missing modules (จะ scaffold จริงในขั้นตอนถัดไป)
-const Embedding = {
-  // Mock embedding service - สร้าง vector representations จาก text
-  async embedTexts(texts) {
-    console.log("⚠️  Embedding service: Mock mode (ใช้ random vectors)");
-    
-    // สร้าง mock vectors ขนาด 384 dimensions (standard for many embedding models)
-    const mockVectors = texts.map((text, index) => {
-      const vector = new Array(384).fill(0);
-      // สร้าง pseudo-random values จาก text length และ index
-      const seed = text.length + index * 17;
-      for (let i = 0; i < 384; i++) {
-        vector[i] = (Math.sin(seed + i * 0.1) + 1) / 2 * 0.5; // 0-0.5 range
-      }
-      return vector;
-    });
-    
-    console.log(`📊 สร้าง ${mockVectors.length} mock vectors สำหรับ ${texts.length} texts`);
-    return mockVectors;
-  }
-};
-
-const AutoTag = {
-  // Mock auto-tagging service - แยก keywords พื้นฐาน
-  async autoTagOnObservations(observations) {
-    console.log("⚠️  Auto-tagging service: Mock mode (keyword extraction)");
-    
-    const taggedObservations = observations.map(obs => {
-      const { entityName, contents } = obs;
-      const allText = contents.join(' ');
-      
-      // Simple keyword extraction (mock implementation)
-      const words = allText.toLowerCase()
-        .replace(/[^\w\s]/g, '')
-        .split(/\s+/)
-        .filter(word => word.length > 3 && word.length < 15);
-      
-      const uniqueWords = [...new Set(words)].slice(0, 5); // Top 5 keywords
-      
-      return {
-        ...obs,
-        autoTags: uniqueWords,
-        tagConfidence: Array(uniqueWords.length).fill(0.7) // Mock confidence
-      };
-    });
-    
-    console.log(`🏷️  สร้าง auto-tags สำหรับ ${taggedObservations.length} observations`);
-    return taggedObservations;
-  }
-};
 
 const Lineage = {
   // Lineage logging system - บันทึก operations ใน JSON log
@@ -107,15 +59,19 @@ export async function ensureInitialized() {
     await System.ensureBaseline();
     console.log("✅ Baseline configuration สร้างเรียบร้อย");
     
-    // 3. เตรียม memory graph store
+    // 3. Initialize services
+    await Embedding.initialize();
+    await AutoTag.initialize();
+
+    // 4. เตรียม memory graph store
     await MemoryGraph.ensureStore();
     console.log("✅ Memory Graph store พร้อมใช้งาน");
     
-    // 4. สร้าง Root memory node (#0)
+    // 5. สร้าง Root memory node (#0)
     const rootMemory = await Memory0.ensureRoot();
     console.log(`✅ Root Memory Node (${rootMemory?.name || 'memory0'}) พร้อมใช้งาน`);
     
-    // 5. Test basic functionality
+    // 6. Test basic functionality
     console.log("🧪 ทดสอบ basic functionality...");
     const testEntity = await createEntities([{
       name: "test-system",
@@ -399,14 +355,18 @@ export const selfDescribe = async () => {
   }
 };
 
+// 🤖 Workflow Engine - สำหรับการทำงานแบบเป็นขั้นตอน
+export const executeWorkflow = WorkflowEngine.executeWorkflow;
+
 // 🔌 Export Submodules - สำหรับการใช้งานแบบ granular
 export {
   MemoryGraph,
   Memory0,
   System,
-  Embedding,  // Mock - จะ implement จริงต่อไป
-  AutoTag,    // Mock - จะ implement จริงต่อไป
-  Lineage
+  Embedding,
+  AutoTag,
+  Lineage,
+  WorkflowEngine
 };
 
 // 🧪 Utility Functions - ฟังก์ชันช่วยเหลือ
@@ -450,8 +410,8 @@ export async function healthCheck() {
       memoryGraph: 'ready',
       memory0: 'ready',
       system: 'ready',
-      embedding: 'mock',  // ยังไม่ implement จริง
-      autoTag: 'mock',    // ยังไม่ implement จริง
+      embedding: await Embedding.healthCheck(),
+      autoTag: await AutoTag.healthCheck(),
       lineage: 'ready'
     },
     storage: {
@@ -463,12 +423,12 @@ export async function healthCheck() {
   try {
     await fs.access(path.join(process.cwd(), 'memory', 'memory_store.json'));
     status.storage.memoryStore = true;
-  } catch {}
+  } catch { /* empty */ }
   
   try {
     await fs.access(path.join(process.cwd(), 'memory', 'lineage_log.json'));
     status.storage.lineageLog = true;
-  } catch {}
+  } catch { /* empty */ }
   
   // Test basic connectivity
   try {
