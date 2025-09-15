@@ -423,12 +423,12 @@ export async function healthCheck() {
   try {
     await fs.access(path.join(process.cwd(), 'memory', 'memory_store.json'));
     status.storage.memoryStore = true;
-  } catch {}
+  } catch { /* empty */ }
   
   try {
     await fs.access(path.join(process.cwd(), 'memory', 'lineage_log.json'));
     status.storage.lineageLog = true;
-  } catch {}
+  } catch { /* empty */ }
   
   // Test basic connectivity
   try {
