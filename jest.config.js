@@ -1,8 +1,9 @@
 const config = {
   testEnvironment: 'node',
-  // The transform property is crucial for Jest to handle ES Modules.
-  // An empty object tells it to use the default (babel-jest).
-  transform: {},
+  // Use babel-jest to transpile .js files.
+  transform: {
+    '^.+\\.js$': 'babel-jest',
+  },
 };
 
 export default config;
