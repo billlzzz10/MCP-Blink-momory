@@ -474,7 +474,14 @@ async function vectorSearch(queryVector, options) {
 
     let bestCentroid = -1;
     let maxSimilarity = -Infinity;
-    for (let i = 0; i < centroids.length; i++) {
+    // Ensure centroids is a real array and cap length to a safe upper bound
+    const MAX_CENTROIDS = 1000;
+    if (!Array.isArray(centroids)) {
+        console.warn("⚠️ Centroids is not a valid array.");
+        return [];
+    }
+    const safeLength = Math.min(centroids.length, MAX_CENTROIDS);
+    for (let i = 0; i < safeLength; i++) {
         const similarity = cosineSimilarity(queryVector, centroids[i]);
         if (similarity > maxSimilarity) {
             maxSimilarity = similarity;
