@@ -91,6 +91,9 @@ function sanitizeMetadata(metadata) {
   for (const [key, value] of Object.entries(metadata)) {
     if (typeof key !== 'string') continue;
     const safeKey = key.replace(/[^a-zA-Z0-9-_]+/g, '_');
+    if (safeKey === '__proto__' || safeKey === 'constructor' || safeKey === 'prototype') {
+      continue;
+    }
     if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
       clean[safeKey] = value;
     }
