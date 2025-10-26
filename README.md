@@ -1,4 +1,4 @@
-# MCP-Blink-momory
+# MCP-Blink-memory
 
 Modular, audit-ready memory system combining knowledge graph structure, semantic embeddings, auto tagging, and root identity to support agentic workflows.
 
