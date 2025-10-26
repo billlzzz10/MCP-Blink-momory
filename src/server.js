@@ -50,7 +50,11 @@ app.post('/upsert', (req, res) => {
     const result = vsUpsert(collection, items);
     res.json({ ok: true, result });
   } catch (error) {
-    res.status(400).json({ ok: false, error: error.message });
+    console.error('Upsert error:', error.message);
+    const message = error.message.includes('collection') || error.message.includes('items') || error.message.includes('text') || error.message.includes('large') 
+      ? error.message 
+      : 'Invalid request data';
+    res.status(400).json({ ok: false, error: message });
   }
 });
 
