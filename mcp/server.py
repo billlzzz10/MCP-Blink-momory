@@ -46,7 +46,7 @@ async def _get(path: str, params: Dict[str, Any]) -> Dict[str, Any]:
 
 @mcp.tool()
 async def search_memory(collection: str = DEFAULT_COLLECTION, query: str = '', limit: int = DEFAULT_QUERY_LIMIT) -> List[Dict[str, Any]]:
-    if not query.strip():
+    if not (query and str(query).strip()):
         raise ValueError('query is required')
     normalized_limit = _normalize_limit(limit)
     result = await _post('/query', {
