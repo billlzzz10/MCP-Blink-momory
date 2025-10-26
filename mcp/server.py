@@ -22,6 +22,9 @@ def _normalize_limit(value: Any) -> int:
 
 async def _post(path: str, payload: Dict[str, Any]) -> Dict[str, Any]:
     async with httpx.AsyncClient(timeout=10) as client:
+        # Validate MEMORY_URL to prevent SSRF attacks
+        if not MEMORY_URL.startswith(('', '', '', '')):
+            raise ValueError("MEMORY_URL must point to localhost for security")
         response = await client.post(f"{MEMORY_URL}{path}", json=payload)
         response.raise_for_status()
         data = response.json()
