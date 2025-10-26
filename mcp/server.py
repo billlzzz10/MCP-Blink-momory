@@ -59,7 +59,7 @@ async def search_memory(collection: str = DEFAULT_COLLECTION, query: str = '', l
 
 @mcp.tool()
 async def fetch_memory_document(collection: str = DEFAULT_COLLECTION, document_id: str = '') -> Dict[str, Any]:
-    if not document_id.strip():
+    if not (document_id and str(document_id).strip()):
         raise ValueError('document_id is required')
     result = await _get('/doc', {
         'collection': collection,
