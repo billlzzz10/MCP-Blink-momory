@@ -51,7 +51,11 @@ function persistCollection(name, data) {
     items: data.items,
     updatedAt: data.updatedAt ?? new Date().toISOString(),
   };
-  fs.writeFileSync(file, JSON.stringify(payload, null, 2), 'utf8');
+  try {
+    fs.writeFileSync(file, JSON.stringify(payload, null, 2), 'utf8');
+  } catch (error) {
+    throw new Error(`Failed to persist collection: ${error.message}`);
+  }
   return payload;
 }
 
