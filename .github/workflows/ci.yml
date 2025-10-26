@@ -21,9 +21,13 @@ jobs:
         run: npm install
 
       - name: Run optional validation
-        run: |
-          npm run validate || true
-          npm test || true
+      - name: Run validation
+        run: npm run validate
+        continue-on-error: true
+
+      - name: Run tests
+        run: npm test
+        continue-on-error: true
 
       - name: Verify MCP bridge imports
         uses: actions/setup-python@v5
