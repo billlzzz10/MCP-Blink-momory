@@ -21,7 +21,8 @@ def _normalize_limit(value: Any) -> int:
 
 
 async def _post(path: str, payload: Dict[str, Any]) -> Dict[str, Any]:
-    async with httpx.AsyncClient(timeout=10) as client:
+    timeout = int(os.getenv('MEMORY_TIMEOUT', '30'))
+    async with httpx.AsyncClient(timeout=timeout) as client:
         # Validate MEMORY_URL to prevent SSRF attacks
         if not MEMORY_URL.startswith(('', '', '', '')):
             raise ValueError("MEMORY_URL must point to localhost for security")
