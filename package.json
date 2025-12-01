@@ -1,16 +1,22 @@
-﻿{
-    "version":  "1.0.0",
-    "name":  "mcp-blink-memory",
-    "author": "billlzzz10",
-    "description":  "Explicit Agent Protocol + Knowledge Graph Memory",
-    "scripts":  {
-                    "validate":  "node modules/system/validate.js",
-                    "describe":  "node modules/system/describe.js"
-                },
-    "bin":  {
-                "explicit-agent":  "index.js"
-            },
-    "dependencies":  {
-                         "yaml":  "^2.3.0"
-                     }
+{
+  "name": "mcp-blink-memory",
+  "version": "1.0.0",
+  "description": "Explicit Agent Protocol + Knowledge Graph Memory",
+  "type": "module",
+  "author": "billlzzz10",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "NODE_ENV=development node src/server.js",
+    "validate": "node modules/system/validate.js",
+    "describe": "node modules/system/describe.js"
+  },
+  "bin": {
+    "explicit-agent": "index.js"
+  },
+  "dependencies": {
+    "cors": "~2.8.5",
+    "express": "~4.19.2",
+    "helmet": "~7.1.0",
+    "yaml": "~2.3.0"
+  }
 }

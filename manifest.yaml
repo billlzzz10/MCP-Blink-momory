@@ -1,13 +1,18 @@
-﻿system_name: "Explicit Agent Protocol with KG Memory"
+system_name: "Explicit Agent Protocol with KG Memory"
 version: "1.0.0"
 modules:
   - name: memory_graph
-    purpose: "เธเธฑเธ”เธเธฒเธฃเธเธงเธฒเธกเธเธณเนเธเธเธเธฃเธฒเธ"
+    purpose: "Maintain relationships between entities and experiences."
   - name: embedding_service
-    purpose: "เธเธฑเธ embedding เธชเธณเธซเธฃเธฑเธ semantic search"
+    purpose: "Generate dense embeddings for semantic recall."
   - name: auto_tag_service
-    purpose: "เธ•เธดเธ”เนเธ—เนเธเธเธงเธฒเธกเธเธณเธญเธฑเธ•เนเธเธกเธฑเธ•เธด"
+    purpose: "Automatically label and categorise stored memories."
   - name: memory0_service
-    purpose: "เธเธฑเธ”เธเธฒเธฃ root memory node"
-entry_point: "index.js"
-audit_ready: true
+    purpose: "Bootstrap knowledge for cold-start interactions."
+services:
+  - name: rest_memory_api
+    entry: src/server.js
+    description: "Express server powering the `/upsert`, `/query`, `/doc`, and stats endpoints."
+  - name: mcp_bridge
+    entry: mcp/server.py
+    description: "FastMCP bridge connecting ChatGPT Developer Mode to the REST API."

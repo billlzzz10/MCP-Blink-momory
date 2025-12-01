@@ -1,4 +1,7 @@
-
-
-#Ignore vscode AI rules
-.github\instructions\codacy.instructions.md
+node_modules/
+.env
+.DS_Store
+.idea/
+.vscode/
+__pycache__/
+*.pyc

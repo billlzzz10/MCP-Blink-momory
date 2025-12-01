@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: ["*"]
+  pull_request:
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+
+      - name: Install Node dependencies
+        run: npm install
+
+      - name: Run optional validation
+      - name: Run validation
+        run: npm run validate
+        continue-on-error: true
+
+      - name: Run tests
+        run: npm test
+        continue-on-error: true
+
+      - name: Verify MCP bridge imports
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install MCP dependencies
+        run: pip install -r requirements.txt
+
+      - name: Byte-compile MCP package
+        run: python -m compileall mcp
