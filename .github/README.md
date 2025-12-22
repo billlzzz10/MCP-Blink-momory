@@ -1,460 +1,588 @@
-# Explicit Agent Protocol + Knowledge Graph Memory
+  # MCP Blink Memory - TypeScript Edition
 
-[![Node.js](https://img.shields.io/badge/Node.js-v18+-informational?logo=node.js)](https://nodejs.org/)
-[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![npm version](https://badge.fury.io/js/mcp-blink-memory.svg)](https://badge.fury.io/js/mcp-blink-memory)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+  [![Node.js](https://img.shields.io/badge/Node.js-v18+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+  [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+  [![npm](https://img.shields.io/npm/v/mcp-blink-memory?color=CC3534&logo=npm)](https://www.npmjs.com/package/mcp-blink-memory)
+  [![JSON-RPC](https://img.shields.io/badge/JSON--RPC-2.0-4B8BBE?logo=json&logoColor=white)](https://www.jsonrpc.org/specification)
 
-**Explicit Agent Protocol with Knowledge Graph Memory** - ระบบจัดการความจำแบบกราฟความรู้สำหรับ AI agents ที่ต้องการความโปร่งใสและการตรวจสอบได้ รองรับ semantic search, auto-tagging, และ lineage tracking โดยใช้ ES6 modules แบบ standalone (ไม่ต้อง server หรือ Docker)
+  **Model Context Protocol (MCP) Compatible Knowledge Graph Memory System** — ระบบจัดการความจำแบบกราฟความรู้สำหรับ AI agents ที่ตรงตามมาตรฐาน MCP ใช้ JSON-RPC 2.0 สำหรับ communication รองรับ semantic search, auto-tagging และ lineage tracking ด้วย TypeScript
 
-## ✨ คุณสมบัติหลัก
+  ## ✨ คุณสมบัติหลัก
 
-- **🏗️ Knowledge Graph Core** - จัดการ entities, relations, observations ในรูปแบบกราฟที่ยืดหยุ่น
-- **🔍 Semantic Search** - ค้นหาด้วย vector embeddings (OpenAI, HuggingFace, Mock)
-- **🏷️ Auto-Tagging** - สร้าง tags อัตโนมัติจากเนื้อหา (รองรับภาษาไทยและอังกฤษ)
-- **📜 Lineage Tracking** - บันทึกประวัติการดำเนินการทุกขั้นตอนแบบ audit-ready
-- **🌱 Root Memory Node** - จัดการ memory node หลัก (#0) สำหรับ system baseline
-- **⚙️ Modular Architecture** - แยก modules ชัดเจนและ extensible
-- **💾 Persistent Storage** - ใช้ JSON files สำหรับ data persistence
-- **🌍 Multi-Language** - รองรับการประมวลผลภาษาไทยและอังกฤษ
+  - 🏗️ **MCP Standard Compliance** — ตรงตามมาตรฐาน Model Context Protocol ด้วย JSON-RPC 2.0
+  - 🧠 **Knowledge Graph Core** — จัดการ entities, relations, observations ในรูปแบบกราฟที่ยืดหยุ่น
+  - 🔍 **Semantic Search** — ค้นหาด้วย vector embeddings (OpenAI, HuggingFace, Mock)
+  - 🏷️ **Auto-Tagging** — สร้าง tags อัตโนมัติจากเนื้อหา (รองรับภาษาไทยและอังกฤษ)
+  - 📜 **Audit-Ready Lineage** — บันทึกประวัติการดำเนินการทุกขั้นตอนแบบตรวจสอบได้
+  - 🌱 **Root Memory Node** — จัดการ memory node หลัก (#0) สำหรับ system baseline
+  - ⚡ **TypeSafe Architecture** — พัฒนาด้วย TypeScript สำหรับ type safety ที่ดีขึ้น
+  - 💾 **Persistent Storage** — ใช้ JSON files สำหรับ data persistence
+  - 🌍 **Multi-Language** — รองรับการประมวลผลภาษาไทยและอังกฤษ
 
-## 🏗️ สถาปัตยกรรมระบบ
+  ## 🏗️ สถาปัตยกรรมระบบ
 
-```
-Explicit Agent Protocol + KG Memory Architecture
-│
-├── index.js                          # 🎯 Public API Surface
-│   ├── Core Functions                # createEntities(), addObservations(), etc.
-│   ├── Mock Implementations          # สำหรับ modules ที่ยังไม่สมบูรณ์
-│   └── Health Check                  # ตรวจสอบสถานะระบบ
-│
-├── modules/                          # 📦 Modular Components
-│   ├── memory_graph/                 # 🧠 Knowledge Graph Core
-│   │   ├── Entity Management         # createEntities(), deleteEntities()
-│   │   ├── Relation Management       # createRelations(), semanticSearch()
-│   │   ├── Observation Handling      # addObservations(), searchByTag()
-│   │   └── Graph Analytics           # getGraphStats(), readGraph()
-│   │
-│   ├── embedding_service/            # 🔗 Text-to-Vector Embeddings
-│   │   ├── Mock Implementation       # generateMockVector()
-│   │   ├── OpenAI Integration        # callOpenAIEmbeddings()
-│   │   ├── HuggingFace Integration   # callHuggingFaceEmbeddings()
-│   │   └── Vector Math               # cosineSimilarity(), normalizeVector()
-│   │
-│   ├── auto_tag_service/             # 🏷️ Automatic Tagging
-│   │   ├── Basic Keyword Extraction  # รองรับภาษาไทย/อังกฤษ
-│   │   ├── Advanced NLP              # Noun phrases, named entities
-│   │   └── ML-based Tagging          # Mock ML predictions
-│   │
-│   ├── memory0_service/              # 🌱 Root Memory Management
-│   │   ├── ensureRoot()              # สร้าง root memory node
-│   │   ├── linkToRoot()              # เชื่อม entities กับ root
-│   │   └── getRootMemory()           # ดึง root memory data
-│   │
-│   └── system/                       # ⚙️ System Utilities
-│       ├── validateStructure()       # ตรวจสอบโครงสร้างโปรเจ็กต์
-│       └── selfDescribe()            # System description
-│
-├── memory/                           # 💾 Persistent Storage
-│   ├── memory_store.json             # Main entities & relations
-│   ├── lineage_log.json              # Operation history
-│   ├── embedding_cache.json          # Vector embeddings cache
-│   ├── tag_model.json                # Tagging model data
-│   └── tag_cache.json                # Tag cache
-│
-├── config/                           # ⚙️ Configuration
-│   └── access_policy.yaml            # File access permissions
-│
-├── docs/                             # 📚 Documentation
-│   ├── audit_log.md                  # Audit trail
-│   ├── legacy_clues.md               # Migration notes
-│   └── changelog.md                  # Version history
-│
-└── .github/                          # 🤝 GitHub Integration
-    └── workflows/                    # CI/CD pipelines
-```
+  ```
+  MCP Blink Memory - TypeScript Architecture
+  │
+  ├── src/
+  │   ├── server/                        # 🎯 MCP JSON-RPC 2.0 Server
+  │   │   ├── index.ts                  # MCP Server หลัก
+  │   │   ├── router.ts                 # Route methods ไปยัง handlers
+  │   │   ├── error-handler.ts          # JSON-RPC error formatting
+  │   │   └── handlers/                 # JSON-RPC Request Handlers
+  │   │       ├── entity.handler.ts     # createEntities(), deleteEntities()
+  │   │       ├── search.handler.ts     # semanticSearch(), searchByTag()
+  │   │       ├── graph.handler.ts      # createRelations(), getGraphStats()
+  │   │       └── system.handler.ts     # healthCheck(), selfDescribe()
+  │   │
+  │   ├── core/                         # 📦 Core Business Logic
+  │   │   ├── memory-graph/             # 🧠 Knowledge Graph Core
+  │   │   ├── embedding-service/        # 🔗 Text Embeddings (OpenAI/HuggingFace)
+  │   │   ├── auto-tag-service/         # 🏷️ Automatic Tagging System
+  │   │   ├── memory0-service/          # 🌱 Root Memory Management
+  │   │   └── system/                   # ⚙️ System Utilities
+  │   │
+  │   ├── types/                        # 📐 TypeScript Type Definitions
+  │   │   ├── rpc.types.ts             # JSON-RPC 2.0 Types
+  │   │   ├── memory.types.ts          # Entity, Observation, Relation Types
+  │   │   ├── embedding.types.ts       # Vector, Embedding Types
+  │   │   └── graph.types.ts           # Graph Structure Types
+  │   │
+  │   ├── storage/                      # 💾 Persistent Data Management
+  │   │   ├── memory-store.ts          # Main Knowledge Graph Storage
+  │   │   ├── lineage-logger.ts        # Audit Trail Logger
+  │   │   └── cache-manager.ts         # Embedding & Tag Cache
+  │   │
+  │   ├── utils/                        # ⚙️ Utility Functions
+  │   │   ├── logger.ts                # Structured Logging
+  │   │   ├── validator.ts             # Input Validation
+  │   │   └── config.ts                # Environment Configuration
+  │   │
+  │   └── index.ts                      # 🚀 Application Entry Point
+  │
+  ├── dist/                             # 📦 Compiled JavaScript (หลัง build)
+  │
+  ├── schemas/                          # 🏗️ JSON Schemas สำหรับ Validation
+  │   ├── entity.schema.json
+  │   ├── observation.schema.json
+  │   └── rpc-request.schema.json
+  │
+  ├── memory/                           # 💾 Persistent Storage Files
+  │   ├── memory_store.json             # Main entities & relations
+  │   ├── lineage_log.json              # Operation history (audit trail)
+  │   ├── embedding_cache.json          # Vector embeddings cache
+  │   └── tag_cache.json                # Tag cache
+  │
+  ├── config/                           # ⚙️ Configuration
+  │   └── mcp-config.yaml               # MCP Server Configuration
+  │
+  ├── examples/                         # 📚 Usage Examples
+  │   ├── client-javascript.js          # JavaScript Client Example
+  │   ├── client-python.py              # Python Client Example
+  │   └── curl-requests.sh              # cURL Examples
+  │
+  └── tests/                            # 🧪 Test Suites
+      ├── unit/
+      ├── integration/
+      └── e2e/
+  ```
 
-## 🚀 เริ่มต้นใช้งาน
+  ## 🚀 เริ่มต้นใช้งาน
 
-### ข้อกำหนดเบื้องต้น
+  ### ข้อกำหนดเบื้องต้น
 
-- **Node.js** ≥ 18.0.0
-- **npm** ≥ 8.0.0
-- **Git** (สำหรับ clone repository)
+  - Node.js ≥ 18.0.0
+  - npm ≥ 9.0.0 หรือ yarn ≥ 1.22.0
+  - TypeScript ≥ 5.0 (ติดตั้งอัตโนมัติผ่าน dependencies)
+  - Git (สำหรับ clone repository)
 
-### ติดตั้ง
+  ### ติดตั้ง
 
-```bash
-# Clone repository
-git clone https://github.com/your-org/mcp-blink-memory.git
-cd mcp-blink-memory
+  ```bash
+  # Clone repository
+  git clone https://github.com/your-org/mcp-blink-memory.git
+  cd mcp-blink-memory
 
-# ติดตั้ง dependencies
-npm install
+  # ติดตั้ง dependencies
+  npm install
 
-# ตรวจสอบการติดตั้ง
-npm run test:bootstrap
-```
+  # Build TypeScript project
+  npm run build
 
-### Environment Variables (ไม่บังคับ)
+  # หรือสำหรับ development mode
+  npm run dev
+  ```
 
-```bash
-# Embedding configuration
-EMBEDDING_MODE=openai                    # mock, openai, huggingface
-OPENAI_API_KEY=sk-your-openai-key        # สำหรับ OpenAI embeddings
-HUGGINGFACE_API_KEY=hf-your-hf-key       # สำหรับ HuggingFace embeddings
-EMBEDDING_DIMENSIONS=384                 # Vector dimensions
+  ### Environment Variables
 
-# Tagging configuration
-TAG_MODE=advanced                        # basic, advanced, ml
-TAG_LANGUAGE=th                          # th, en
+  ```bash
+  # MCP Server Configuration
+  MCP_PORT=7070                          # Port สำหรับ MCP Server
+  MCP_HOST=localhost                     # Host สำหรับ MCP Server
+  MCP_LOG_LEVEL=info                     # log level: debug, info, warn, error
 
-# System configuration
-NODE_ENV=development                     # development, production
-```
+  # Embedding configuration
+  EMBEDDING_MODE=mock                    # mock, openai, huggingface
+  OPENAI_API_KEY=sk-...                  # สำหรับ OpenAI embeddings
+  HUGGINGFACE_API_KEY=hf-...             # สำหรับ HuggingFace embeddings
+  EMBEDDING_DIMENSIONS=384               # Vector dimensions
 
-## 📖 การใช้งาน
+  # Tagging configuration
+  TAG_MODE=advanced                      # basic, advanced, ml
+  TAG_LANGUAGE=th                        # th, en
 
-### 1. Initialization - เตรียมระบบ
+  # Storage configuration
+  STORAGE_PATH=./memory                  # Path สำหรับ data storage
+  ENABLE_AUDIT_LOG=true                  # เปิด/ปิด audit logging
+  ```
 
-```javascript
-import { ensureInitialized, healthCheck } from './index.js';
+  ## 📖 การใช้งาน
 
-// Initialize system
-await ensureInitialized();
+  ### 1. เริ่ม MCP Server
 
-// Health check
-const status = await healthCheck();
-console.log('System Status:', status);
-```
+  ```bash
+  # Development mode (hot reload)
+  npm run dev
 
-### 2. สร้าง Entities - เพิ่มข้อมูลใหม่
+  # Production mode
+  npm run build
+  npm start
 
-```javascript
-// สร้าง entities พร้อม auto-tagging
-const entities = [
-  {
-    name: "AI Research Lab",
-    type: "organization",
-    observations: [
-      "Laboratory focused on artificial intelligence research and development",
-      "Located in Bangkok, Thailand",
-      "Specializes in natural language processing and computer vision"
-    ],
-    data: {
-      founded: 2020,
-      employees: 25,
-      website: "https://ai-lab.th"
+  # หรือระบุพอร์ตที่ต้องการ
+  MCP_PORT=8080 npm start
+  ```
+
+  ### 2. การเชื่อมต่อผ่าน JSON-RPC 2.0
+
+  #### ตัวอย่างการเรียกใช้ผ่าน cURL
+
+  ```bash
+  # Health check
+  curl -X POST http://localhost:7070/jsonrpc \
+    -H "Content-Type: application/json" \
+    -d '{
+      "jsonrpc": "2.0",
+      "method": "healthCheck",
+      "params": {},
+      "id": 1
+    }'
+
+  # สร้าง entities
+  curl -X POST http://localhost:7070/jsonrpc \
+    -H "Content-Type: application/json" \
+    -d '{
+      "jsonrpc": "2.0",
+      "method": "createEntities",
+      "params": {
+        "entities": [
+          {
+            "name": "AI Research Lab",
+            "type": "organization",
+            "observations": [
+              "Laboratory focused on artificial intelligence research",
+              "Located in Bangkok, Thailand"
+            ]
+          }
+        ],
+        "options": {
+          "autoTag": true,
+          "linkToMemory0": true
+        }
+      },
+      "id": 2
+    }'
+  ```
+
+  #### ตัวอย่าง JavaScript Client
+
+  ```javascript
+  import { MCPBlinkMemoryClient } from 'mcp-blink-memory/client';
+
+  const client = new MCPBlinkMemoryClient('http://localhost:7070');
+
+  // Health check
+  const health = await client.healthCheck();
+  console.log('Server status:', health);
+
+  // สร้าง entities
+  const result = await client.createEntities([
+    {
+      name: "AI Research Lab",
+      type: "organization",
+      observations: [
+        "Laboratory focused on artificial intelligence research",
+        "Located in Bangkok, Thailand"
+      ]
     }
-  },
-  {
-    name: "Dr. Somchai AI",
-    type: "person",
-    observations: [
-      "Lead researcher at AI Research Lab",
-      "PhD in Machine Learning from Chulalongkorn University",
-      "Specializes in transformer models and semantic search"
-    ]
-  }
-];
+  ], { autoTag: true });
 
-// Create with auto-tagging and link to root
-const created = await createEntities(entities, {
-  autoTag: true,
-  linkToMemory0: true
-});
+  console.log(`Created ${result.count} entities`);
+  ```
 
-console.log(`Created ${created.length} entities with tags:`);
-created.forEach(entity => {
-  console.log(`- ${entity.name}: ${entity.autoTags?.join(', ') || 'no tags'}`);
-});
-```
+  #### ตัวอย่าง TypeScript Client
 
-### 3. Semantic Search - ค้นหาด้วยความหมาย
+  ```typescript
+  import { MCPBlinkMemoryClient, EntityInput } from 'mcp-blink-memory';
 
-```javascript
-// ค้นหาด้วย semantic similarity
-const results = await semanticSearch("artificial intelligence research in Thailand", {
-  topK: 5,
-  threshold: 0.3,
-  tagFilter: ['ai', 'research', 'thailand']
-});
-
-console.log('Semantic Search Results:');
-results.forEach((result, index) => {
-  console.log(`${index + 1}. ${result.entity.name} (similarity: ${result.similarity.toFixed(3)})`);
-  console.log(`   Tags: ${result.matchedTags.join(', ')}`);
-  console.log(`   Observations: ${result.observations.map(o => o.content.substring(0, 50) + '...').join('; ')}`);
-});
-```
-
-### 4. Auto-Tagging - สร้าง tags อัตโนมัติ
-
-```javascript
-// เพิ่ม observations พร้อม auto-tagging
-const observations = [
-  {
-    entityName: "AI Research Lab",
-    contents: [
-      "Recently published paper on Thai language models in ACL 2024",
-      "Developing new semantic search engine for Thai documents",
-      "Collaborating with universities on AI education programs"
-    ],
-    source: "news article"
-  }
-];
-
-const tagged = await addObservations(observations, { autoTag: true });
-
-console.log('Auto-tagged observations:');
-tagged.forEach(obs => {
-  console.log(`Entity: ${obs.entityName}`);
-  console.log(`Generated tags: ${obs.autoTags.join(', ')}`);
-  console.log(`Confidence: ${obs.tagConfidence?.map(c => c.toFixed(2)).join(', ')}`);
-});
-```
-
-### 5. Graph Operations - จัดการ Knowledge Graph
-
-```javascript
-// สร้าง relations ระหว่าง entities
-const relations = [
-  {
-    from: "AI Research Lab",
-    to: "Dr. Somchai AI",
-    relationType: "employs",
-    properties: { role: "lead researcher", since: "2020" }
-  },
-  {
-    from: "Dr. Somchai AI",
-    to: "AI Research Lab",
-    relationType: "works_at",
-    properties: { position: "Lead AI Researcher" }
-  }
-];
-
-const relationResult = await createRelations(relations, { linkToMemory0: true });
-console.log(`Created ${relationResult.created} relations`);
-
-// อ่าน graph ทั้งหมด
-const fullGraph = await readGraph();
-console.log(`Graph stats: ${fullGraph.stats.totalEntities} entities, ${fullGraph.stats.totalRelations} relations`);
-```
-
-### 6. System Management - จัดการระบบ
-
-```javascript
-// ตรวจสอบโครงสร้าง
-const isValid = await validateStructure();
-console.log('Structure validation:', isValid ? 'PASS' : 'FAIL');
-
-// Self-description
-const description = await selfDescribe();
-console.log('System description:', JSON.stringify(description, null, 2));
-
-// Health check
-const health = await healthCheck();
-console.log('Health status:', health);
-```
-
-## 📁 โครงสร้างไฟล์
-
-```
-mcp-blink-memory/
-├── index.js                          # 🎯 Main API entry point
-├── package.json                      # 📦 Dependencies & scripts
-├── README.md                         # 📖 Documentation
-├── init.ps1                          # 🛠️ Project initialization (Windows)
-├── manifest.yaml                     # 📋 System manifest
-├── structure.schema.yaml             # 🏗️ Project structure validation
-│
-├── config/
-│   └── access_policy.yaml            # 🔐 File access permissions
-│
-├── docs/                             # 📚 Documentation
-│   ├── audit_log.md                  # 📝 Audit trail
-│   ├── legacy_clues.md               # 🔍 Migration notes
-│   └── changelog.md                  # 📈 Version history
-│
-├── memory/                           # 💾 Data storage
-│   ├── memory_store.json             # 🧠 Main knowledge graph
-│   ├── lineage_log.json              # 📜 Operation history
-│   ├── embedding_cache.json          # 🔗 Vector cache
-│   ├── tag_model.json                # 🏷️ Tagging model
-│   └── tag_cache.json                # 📊 Tag cache
-│
-├── modules/                          # 📦 Core modules
-│   ├── memory_graph/                 # 🧠 Knowledge Graph (entities, relations)
-│   ├── embedding_service/            # 🔗 Text embeddings (OpenAI/HuggingFace)
-│   ├── auto_tag_service/             # 🏷️ Automatic tagging system
-│   ├── memory0_service/              # 🌱 Root memory management
-│   └── system/                       # ⚙️ System utilities
-│
-└── .github/                          # 🤝 GitHub integration
-    └── workflows/                    # 🔄 CI/CD pipelines
-```
-
-## ⚙️ Configuration
-
-### Environment Variables
-
-| Variable | Description | Default | Required |
-|----------|-------------|---------|----------|
-| `EMBEDDING_MODE` | Embedding provider | `mock` | No |
-| `OPENAI_API_KEY` | OpenAI API key | - | OpenAI mode |
-| `HUGGINGFACE_API_KEY` | HuggingFace API key | - | HuggingFace mode |
-| `EMBEDDING_DIMENSIONS` | Vector dimensions | `384` | No |
-| `TAG_MODE` | Tagging algorithm | `basic` | No |
-| `TAG_LANGUAGE` | Language support | `th` | No |
-| `NODE_ENV` | Environment | `development` | No |
-
-### Access Policy
-
-ไฟล์ `config/access_policy.yaml` กำหนดสิทธิ์การเข้าถึง:
-
-```yaml
-read_only:
-  - docs/                    # Documentation files
-  - memory/lineage_log.json  # Audit logs
-
-forbidden:
-  - __pycache__/             # Python cache
-  - node_modules/            # Node dependencies
-  - .git/                    # Git metadata
-```
-
-## 🧪 Testing
-
-### Unit Tests
-
-```bash
-# Run all tests
-npm test
-
-# Watch mode
-npm run test:watch
-
-# Bootstrap test (system initialization)
-npm run test:bootstrap
-```
-
-### Integration Tests
-
-```javascript
-// test/integration/memory.test.js
-import { ensureInitialized, createEntities, semanticSearch } from '../index.js';
-
-describe('Knowledge Graph Integration', () => {
-  test('should create and search entities', async () => {
-    await ensureInitialized();
-    
-    const entities = [{
-      name: 'Test Entity',
-      type: 'test',
-      observations: ['This is a test observation']
-    }];
-    
-    const created = await createEntities(entities);
-    expect(created).toHaveLength(1);
-    
-    const results = await semanticSearch('test observation');
-    expect(results).toHaveLength(1);
-    expect(results[0].entity.name).toBe('Test Entity');
+  const client = new MCPBlinkMemoryClient({
+    endpoint: 'http://localhost:7070/jsonrpc',
+    timeout: 30000
   });
-});
-```
 
-## 🔧 Development
+  // สร้าง entities พร้อม auto-tagging
+  const entities: EntityInput[] = [
+    {
+      name: "AI Research Lab",
+      type: "organization",
+      observations: [
+        "Laboratory focused on artificial intelligence research and development",
+        "Located in Bangkok, Thailand",
+        "Specializes in natural language processing and computer vision"
+      ],
+      metadata: {
+        founded: 2020,
+        employees: 25,
+        website: "https://ai-lab.th"
+      }
+    }
+  ];
 
-### Scripts
+  const response = await client.createEntities(entities, {
+    autoTag: true,
+    linkToMemory0: true
+  });
 
-| Script | Description |
-|--------|-------------|
-| `npm run validate` | ตรวจสอบโครงสร้างโปรเจ็กต์ |
-| `npm run describe` | แสดง system description |
-| `npm run test:bootstrap` | ทดสอบ system initialization |
-| `npm test` | Run unit tests |
-| `npm run dev` | Development mode |
-| `npm run lint` | Code linting |
-| `npm run format` | Code formatting |
+  console.log(`Created ${response.data.length} entities with tags:`);
+  response.data.forEach(entity => {
+    console.log(`- ${entity.name}: ${entity.autoTags?.join(', ') || 'no tags'}`);
+  });
+  ```
 
-### Code Style
+  ### 3. Semantic Search — ค้นหาด้วยความหมาย
 
-- **ES6 Modules** - ใช้ `import`/`export` syntax
-- **Async/Await** - สำหรับ asynchronous operations
-- **Consistent Logging** - ใช้ emoji prefixes
-- **Error Handling** - Try/catch ทุก async function
-- **Type Safety** - JSDoc comments สำหรับ complex functions
+  ```typescript
+  // ค้นหาด้วย semantic similarity
+  const searchResults = await client.semanticSearch(
+    "artificial intelligence research in Thailand",
+    {
+      topK: 5,
+      threshold: 0.3,
+      tagFilter: ['ai', 'research', 'thailand']
+    }
+  );
 
-### Contributing
+  console.log('Semantic Search Results:');
+  searchResults.data.forEach((result, index) => {
+    console.log(`${index + 1}. ${result.entity.name} (similarity: ${result.similarity.toFixed(3)})`);
+    console.log(`   Tags: ${result.matchedTags.join(', ')}`);
+    console.log(`   Observations: ${result.observations
+      .map(o => o.content.substring(0, 50) + '...')
+      .join('; ')}`);
+  });
+  ```
 
-1. **Fork** repository
-2. **Create feature branch** (`git checkout -b feature/amazing-feature`)
-3. **Commit changes** (`git commit -m 'Add amazing feature'`)
-4. **Push to branch** (`git push origin feature/amazing-feature`)
-5. **Open Pull Request**
+  ### 4. Graph Operations
 
-### Code Review Checklist
+  ```typescript
+  // สร้าง relations ระหว่าง entities
+  const relationResult = await client.createRelations([
+    {
+      from: "AI Research Lab",
+      to: "Dr. Somchai AI",
+      relationType: "employs",
+      properties: { role: "lead researcher", since: "2020" }
+    }
+  ]);
 
-- [ ] Code passes linting (`npm run lint`)
-- [ ] Tests pass (`npm test`)
-- [ ] Documentation updated
-- [ ] No breaking changes (or documented)
-- [ ] Performance impact assessed
-- [ ] Security considerations addressed
+  console.log(`Created ${relationResult.count} relations`);
 
-## 📄 License
+  // อ่าน graph stats
+  const stats = await client.getGraphStats();
+  console.log(`Graph stats: ${stats.entities} entities, ${stats.relations} relations`);
+  ```
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+  ## 🔌 MCP Integration
 
-## 🙏 Acknowledgments
+  ### ใช้กับ Claude Desktop
 
-- **OpenAI** - สำหรับ embedding models
-- **HuggingFace** - สำหรับ open-source NLP models
-- **Natural.js** - สำหรับ NLP processing
-- **Node.js** - สำหรับ runtime environment
+  1. เพิ่ม configuration ใน Claude Desktop:
 
-## 🚀 Next Steps
+  ```json
+  {
+    "mcpServers": {
+      "blink-memory": {
+        "command": "node",
+        "args": [
+          "/path/to/mcp-blink-memory/dist/index.js"
+        ],
+        "env": {
+          "MCP_PORT": "7070",
+          "EMBEDDING_MODE": "mock"
+        }
+      }
+    }
+  }
+  ```
 
-1. **Production Deployment** - Docker containerization
-2. **Advanced Search** - Hybrid search (keyword + semantic)
-3. **Real-time Updates** - WebSocket integration
-4. **Analytics Dashboard** - Graph visualization
-5. **Multi-agent Support** - Agent collaboration features
+  ### ใช้กับ Cline/VSCode
 
-## Use with ChatGPT Developer Mode (MCP)
+  1. ติดตั้ง MCP Blink Memory extension
+  2. ตั้งค่าใน `.cline/mcp.json`:
 
-1. Run Node backend:
-   ```bash
-   npm i
-   npx mcp-memory run --port 7070
-   ```
+  ```json
+  {
+    "mcpServers": {
+      "blink-memory": {
+        "type": "stdio",
+        "command": "npx",
+        "args": ["mcp-blink-memory", "serve"],
+        "env": {
+          "OPENAI_API_KEY": "your-key-here"
+        }
+      }
+    }
+  }
+  ```
 
-2. Run MCP bridge:
+  ## 📁 โครงสร้างไฟล์
 
-   ```bash
-   cd mcp
-   pip install -r requirements.txt
-   BASE_URL=http://localhost:7070 DEFAULT_COLLECTION=notes python server.py
-   ```
+  ```
+  mcp-blink-memory/
+  ├── package.json                      # 📦 Dependencies & scripts
+  ├── tsconfig.json                     # ⚙️ TypeScript configuration
+  ├── package-lock.json                 # 🔒 Lock file
+  │
+  ├── src/                              # 🎯 Source Code (TypeScript)
+  │   ├── index.ts                      # Application entry point
+  │   ├── server/                       # MCP JSON-RPC 2.0 Server
+  │   ├── core/                         # Core business logic
+  │   ├── types/                        # TypeScript type definitions
+  │   ├── storage/                      # Persistent data management
+  │   └── utils/                        # Utility functions
+  │
+  ├── dist/                             # 📦 Compiled JavaScript
+  │   ├── index.js                      # Compiled entry point
+  │   ├── server/                       # Compiled server code
+  │   └── ...                           # Other compiled modules
+  │
+  ├── schemas/                          # 🏗️ JSON Schemas for validation
+  │   ├── entity.schema.json
+  │   ├── rpc-request.schema.json
+  │   └── ...
+  │
+  ├── memory/                           # 💾 Data storage
+  │   ├── memory_store.json             # 🧠 Main knowledge graph
+  │   ├── lineage_log.json              # 📜 Operation history
+  │   ├── embedding_cache.json          # 🔗 Vector cache
+  │   └── tag_cache.json                # 🏷️ Tag cache
+  │
+  ├── config/                           # ⚙️ Configuration
+  │   └── mcp-config.yaml               # MCP server configuration
+  │
+  ├── examples/                         # 📚 Usage examples
+  │   ├── client-javascript.js          # JavaScript client
+  │   ├── client-python.py              # Python client
+  │   ├── client-typescript.ts          # TypeScript client
+  │   └── curl-requests.sh              # cURL examples
+  │
+  ├── tests/                            # 🧪 Test suites
+  │   ├── unit/                         # Unit tests
+  │   ├── integration/                  # Integration tests
+  │   └── e2e/                          # End-to-end tests
+  │
+  ├── docs/                             # 📖 Documentation
+  │   ├── api-reference.md              # API Reference
+  │   ├── mcp-integration.md            # MCP Integration Guide
+  │   ├── migration-guide.md            # Migration from v1 to v2
+  │   └── changelog.md                  # Version history
+  │
+  └── .github/                          # 🤝 GitHub Integration
+      ├── workflows/                    # CI/CD pipelines
+      │   ├── ci.yml                    # Continuous Integration
+      │   ├── release.yml               # Release automation
+      │   └── test.yml                  # Test automation
+      └── dependabot.yml                # Dependencies updates
+  ```
 
-   MCP SSE URL: `http://localhost:8000/sse/`
+  ## ⚙️ Configuration
 
-3. In ChatGPT → Settings → Connectors → Developer mode → Add server:
+  ### MCP Server Configuration (config/mcp-config.yaml)
 
-   * Label: `mcp-memory`
-   * URL: `http://localhost:8000/sse/`
-  * Allowed tools: `search`, `fetch`
-  * Approval: `never`
+  ```yaml
+  server:
+    port: 7070
+    host: "0.0.0.0"
+    logLevel: "info"
+    cors:
+      enabled: true
+      origin: "*"
 
----
+  features:
+    semanticSearch:
+      enabled: true
+      defaultTopK: 10
+      defaultThreshold: 0.3
+    autoTagging:
+      enabled: true
+      defaultLanguage: "th"
+      minConfidence: 0.5
+    auditLogging:
+      enabled: true
+      maxLogSize: "100MB"
+      retentionDays: 30
 
-### Security notes
+  storage:
+    memoryStorePath: "./memory/memory_store.json"
+    lineageLogPath: "./memory/lineage_log.json"
+    cacheDirectory: "./memory/cache"
+    backup:
+      enabled: true
+      interval: "24h"
+      maxBackups: 7
+  ```
 
-- By default the bridge binds to `0.0.0.0`; set `HOST=127.0.0.1` to keep it local.
-- JSON payloads are capped at 1 MB and individual documents at ~50 kB.
-- Only text payloads are accepted; binary data is rejected.
+  ### Environment Variables Reference
 
+  | Variable | Description | Default | Required |
+  |----------|-------------|---------|----------|
+  | `MCP_PORT` | Port สำหรับ MCP Server | 7070 | No |
+  | `MCP_HOST` | Host สำหรับ binding | localhost | No |
+  | `MCP_LOG_LEVEL` | Log level | info | No |
+  | `EMBEDDING_MODE` | Embedding provider | mock | No |
+  | `OPENAI_API_KEY` | OpenAI API key | - | OpenAI mode |
+  | `HUGGINGFACE_API_KEY` | HuggingFace API key | - | HuggingFace mode |
+  | `STORAGE_PATH` | Path สำหรับ data storage | ./memory | No |
+  | `ENABLE_AUDIT_LOG` | เปิด/ปิด audit logging | true | No |
 
-**Explicit Agent Protocol + KG Memory** - Building transparent, auditable AI memory systems for the future.
+  ## 🧪 Testing
 
-[Demo Video](https://youtu.be/demo) | [API Docs](docs/api.md) | [Contribute](CONTRIBUTING.md)
+  ```bash
+  # Run all tests
+  npm test
+
+  # Run tests with coverage
+  npm run test:coverage
+
+  # Run specific test suites
+  npm run test:unit
+  npm run test:integration
+  npm run test:e2e
+
+  # Watch mode สำหรับ development
+  npm run test:watch
+  ```
+
+  ### Test Examples
+
+  ```typescript
+  // tests/integration/mcp-server.test.ts
+  import { MCPBlinkMemoryServer } from '../src/server';
+  import { JSONRPCRequest } from '../src/types/rpc.types';
+
+  describe('MCP Server Integration', () => {
+    let server: MCPBlinkMemoryServer;
+
+    beforeAll(async () => {
+      server = new MCPBlinkMemoryServer();
+      await server.start();
+    });
+
+    test('should handle health check request', async () => {
+      const request: JSONRPCRequest = {
+        jsonrpc: '2.0',
+        method: 'healthCheck',
+        params: {},
+        id: 1
+      };
+
+      const response = await server.handleRequest(request);
+      expect(response.jsonrpc).toBe('2.0');
+      expect(response.result).toHaveProperty('status', 'healthy');
+      expect(response.result).toHaveProperty('timestamp');
+    });
+
+    test('should create entities via JSON-RPC', async () => {
+      const request: JSONRPCRequest = {
+        jsonrpc: '2.0',
+        method: 'createEntities',
+        params: {
+          entities: [{
+            name: 'Test Entity',
+            type: 'test',
+            observations: ['Test observation']
+          }]
+        },
+        id: 2
+      };
+
+      const response = await server.handleRequest(request);
+      expect(response.result).toHaveProperty('success', true);
+      expect(response.result.data).toHaveLength(1);
+    });
+  });
+  ```
+
+  ## 🔧 Development
+
+  ### Scripts
+
+  | Script | Description |
+  |--------|-------------|
+  | `npm run build` | Compile TypeScript to JavaScript |
+  | `npm start` | Start the MCP server |
+  | `npm run dev` | Development mode with hot reload |
+  | `npm test` | Run all tests |
+  | `npm run lint` | Lint TypeScript code |
+  | `npm run format` | Format code with Prettier |
+  | `npm run validate` | Validate project structure |
+  | `npm run docs` | Generate API documentation |
+  | `npm run clean` | Clean build artifacts |
+
+  ### Code Style
+
+  - **TypeScript Strict Mode** — ใช้ strict type checking
+  - **ESLint + Prettier** — สำหรับ code consistency
+  - **Async/Await** — สำหรับ asynchronous operations
+  - **Error Handling** — Structured error handling with custom error types
+  - **Logging** — Structured logging with context
+  - **Testing** — Test coverage ≥ 80%
+
+  ## 📡 Available JSON-RPC Methods
+
+  | Method | Parameters | Description |
+  |--------|-----------|-------------|
+  | `healthCheck` | - | ตรวจสอบสถานะระบบ |
+  | `createEntities` | entities[], options | สร้าง entities ใหม่ |
+  | `getEntity` | entityId | ดึงข้อมูล entity |
+  | `updateEntity` | entityId, updates | อัปเดต entity |
+  | `deleteEntity` | entityId | ลบ entity |
+  | `addObservations` | entityId, observations[], options | เพิ่ม observations |
+  | `semanticSearch` | query, options | ค้นหาด้วย semantic similarity |
+  | `searchByTag` | tags[], options | ค้นหาด้วย tags |
+  | `createRelations` | relations[], options | สร้าง relations |
+  | `getGraphStats` | - | ดึงสถิติ graph |
+  | `getLineage` | entityId, depth | ดึง lineage history |
+  | `selfDescribe` | - | ดึง system description |
+
+  ## 📄 License
+
+  This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+  ## 🙏 Acknowledgments
+
+  - **OpenAI** — สำหรับ embedding models
+  - **HuggingFace** — สำหรับ open-source NLP models
+  - **Model Context Protocol** — สำหรับ protocol standard
+  - **TypeScript** — สำหรับ type-safe development experience
+  - **JSON-RPC** — สำหรับ standardized communication protocol
+
+  ## 🔄 Migration Guide
+
+  สำหรับผู้ใช้เวอร์ชันเก่า (JavaScript ES6 Modules) โปรดดู [Migration Guide](docs/migration-guide.md) สำหรับรายละเอียดการย้ายมาใช้เวอร์ชัน TypeScript นี้
+
+  ---
+
+  **MCP Blink Memory** — Building transparent, auditable, and type-safe AI memory systems for the future.
+
+  [API Documentation](docs/api-reference.md) • [Migration Guide](docs/migration-guide.md) • [Contribute](CONTRIBUTING.md)
