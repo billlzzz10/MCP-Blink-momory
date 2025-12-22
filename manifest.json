@@ -1,0 +1,120 @@
+{
+  "name": "blink-memory",
+  "version": "2.0.0",
+  "description": "Knowledge Graph Memory System with MCP Support",
+  "protocol_version": "2024-11-05",
+  "capabilities": {
+    "tools": [
+      {
+        "name": "create_entities",
+        "description": "Create new entities in the knowledge graph",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "entities": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/EntityInput"
+              },
+              "description": "Array of entities to create"
+            },
+            "options": {
+              "type": "object",
+              "properties": {
+                "autoTag": {
+                  "type": "boolean",
+                  "description": "Enable automatic tagging"
+                },
+                "linkToMemory0": {
+                  "type": "boolean",
+                  "description": "Link entities to root memory node"
+                }
+              }
+            }
+          },
+          "required": ["entities"]
+        }
+      },
+      {
+        "name": "semantic_search",
+        "description": "Search entities by semantic similarity",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "Search query text"
+            },
+            "options": {
+              "type": "object",
+              "properties": {
+                "topK": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 50,
+                  "description": "Number of results to return"
+                },
+                "threshold": {
+                  "type": "number",
+                  "minimum": 0.0,
+                  "maximum": 1.0,
+                  "description": "Similarity threshold"
+                },
+                "tagFilter": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Filter results by tags"
+                }
+              }
+            }
+          },
+          "required": ["query"]
+        }
+      }
+      // เพิ่ม tools อื่นๆ ตาม API ที่มี
+    ],
+    "resources": [
+      {
+        "uri": "memory://graph/stats",
+        "name": "graph_stats",
+        "description": "Knowledge graph statistics",
+        "mimeType": "application/json"
+      },
+      {
+        "uri": "memory://lineage/latest",
+        "name": "recent_operations",
+        "description": "Recent operations log",
+        "mimeType": "application/json"
+      }
+    ]
+  },
+  "definitions": {
+    "EntityInput": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Entity name"
+        },
+        "type": {
+          "type": "string",
+          "description": "Entity type (person, organization, etc.)"
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Observations about the entity"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Additional metadata"
+        }
+      },
+      "required": ["name", "type"]
+    }
+  }
+}
