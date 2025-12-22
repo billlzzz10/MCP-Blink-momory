@@ -76,7 +76,8 @@
 - **Performance**: Multi-tool chain ใช้ multiple messages (one tool per message) แต่ effective
 
 ## Test Scripts
-- ไม่จำเป็นต้องเขียน scripts เพิ่มเพราะ MCP tools ใช้ XML calls โดยตรง
+- `test-jsonrpc.js` - JSON-RPC 2.0 compliance testing
+- `test-falsy-ids.js` - Edge case testing for falsy ID values
 - ใช้ execute_command สำหรับ filesystem large operations (e.g. for loop write 100 lines)
 - Integration chaining ทำด้วย sequential tool calls ใน conversation
 

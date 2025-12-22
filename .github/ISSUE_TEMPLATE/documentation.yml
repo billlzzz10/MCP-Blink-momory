@@ -1,0 +1,79 @@
+name: 📚 Documentation
+description: Report documentation issues or suggest improvements
+title: "[Docs] "
+labels: ["type:docs", "status:needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us improve our documentation! Report issues or suggest improvements.
+
+  - type: dropdown
+    id: doc_type
+    attributes:
+      label: Documentation Type
+      description: What type of documentation issue is this?
+      options:
+        - README.md
+        - API Reference
+        - Setup Guide
+        - Architecture Documentation
+        - Migration Guide
+        - MCP Integration Guide
+        - Code Comments
+        - Examples
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: Issue Type
+      description: What kind of documentation issue?
+      options:
+        - Missing Information
+        - Incorrect Information
+        - Unclear Instructions
+        - Broken Links
+        - Outdated Content
+        - Typo/Grammar
+        - Suggestion for Improvement
+        - New Documentation Needed
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the documentation issue or improvement
+      placeholder: What's wrong or what could be improved?
+    validations:
+      required: true
+
+  - type: textarea
+    id: location
+    attributes:
+      label: Location
+      description: Where is this documentation located?
+      placeholder: |
+        - File: docs/api-reference.md
+        - Section: "Semantic Search"
+        - Line: 45-50
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Fix/Improvement
+      description: How would you fix or improve this?
+      placeholder: Describe your suggested changes...
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other relevant information
+      placeholder: Add any other context...

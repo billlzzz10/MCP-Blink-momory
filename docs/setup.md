@@ -1,105 +1,143 @@
+# MCP Blink Memory Setup Guide
 
+## Prerequisites
+- Node.js ≥ 18.0.0
+- npm ≥ 9.0.0
+- TypeScript ≥ 5.0 (installed via devDependencies)
 
-# Setup Instructions - Explicit Agent Protocol + KG Memory
+## Installation
 
-## 📋 ข้อกำหนดเบื้องต้น
-
-### ระบบปฏิบัติการที่รองรับ
-- **Windows 10/11** (PowerShell 5.1+, Windows Subsystem for Linux แนะนำ)
-- **macOS** (10.15 Catalina+, Apple Silicon และ Intel)
-- **Linux** (Ubuntu 18.04+, CentOS 7+, Debian 10+)
-
-### Software Requirements
-
-| Software | Version | Link | Notes |
-|----------|---------|------|-------|
-| **Node.js** | ≥ 18.0.0 LTS | [Download](https://nodejs.org/) | Long Term Support version |
-| **npm** | ≥ 8.0.0 | [npmjs.com](https://www.npmjs.com/) | มาพร้อม Node.js |
-| **Git** | ≥ 2.25.0 | [Download](https://git-scm.com/) | สำหรับ clone repository |
-| **VS Code** | ≥ 1.60 | [Download](https://code.visualstudio.com/) | แนะนำสำหรับ development |
-
-### Hardware Requirements
-
-| Component | Minimum | Recommended | Notes |
-|-----------|---------|-------------|-------|
-| **RAM** | 4GB | 8GB+ | สำหรับ batch processing และ caching |
-| **Storage** | 500MB | 2GB+ | Dependencies + data storage |
-| **CPU** | Dual-core | Quad-core+ | Multi-threading สำหรับ embedding |
-| **Network** | Broadband | 100Mbps+ | สำหรับ API calls (OpenAI/HuggingFace) |
-
-## 🚀 การติดตั้งขั้นตอนละเอียด
-
-### Step 1: ติดตั้ง Node.js
-
-#### Windows
-1. ดาวน์โหลด Node.js LTS จาก [nodejs.org](https://nodejs.org/)
-2. รัน installer และทำตามขั้นตอน (เลือก "Add to PATH")
-3. เปิด **Command Prompt** หรือ **PowerShell** ใหม่
-4. ตรวจสอบการติดตั้ง:
-```cmd
-node --version
-npm --version
-```
-**Expected:** `v18.x.x` และ `8.x.x` หรือสูงกว่า
-
-#### macOS
 ```bash
-# ใช้ Homebrew (แนะนำ)
-brew install node
+# Clone repository
+git clone https://github.com/your-org/mcp-blink-memory.git
+cd mcp-blink-memory
 
-# หรือใช้ nvm (Node Version Manager)
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-source ~/.bashrc
-nvm install --lts
-nvm use --lts
+# Install dependencies
+npm install
 
-# ตรวจสอบ
-node --version
-npm --version
+# Build TypeScript
+npm run build
 ```
 
-#### Linux (Ubuntu/Debian)
+## Environment Configuration
+
+Create `.env` file:
 ```bash
-# Update package list
-sudo apt update
+# Server Configuration
+MCP_PORT=7071
+MCP_HOST=localhost
+MCP_LOG_LEVEL=info
 
-# Install using NodeSource repository (LTS)
-curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
-sudo apt-get install -y nodejs
+# Embedding configuration (not implemented yet)
+EMBEDDING_MODE=mock
+EMBEDDING_DIMENSIONS=384
 
-# ตรวจสอบ
-node --version
-npm --version
+# Tagging configuration (not implemented yet)
+TAG_MODE=advanced
+TAG_LANGUAGE=th
 
-# Optional: Install yarn
-npm install -g yarn
+# Storage configuration (not implemented yet)
+STORAGE_PATH=./memory
+ENABLE_AUDIT_LOG=true
 ```
 
-### Step 2: ติดตั้ง Git
+## Running the Server
 
-#### Windows
-1. ดาวน์โหลด Git จาก [git-scm.com](https://git-scm.com/download/win)
-2. รัน installer เลือก:
-   - **"Git from the command line and also from 3rd-party software"**
-   - **"Use Windows default console window"**
-   - **"Checkout Windows-style, commit Unix-style line endings"**
-3. ตรวจสอบ:
-```cmd
-git --version
-```
-
-#### macOS
 ```bash
-# Homebrew
-brew install git
+# Production mode
+npm start
 
-# หรือ Xcode Command Line Tools
-xcode-select --install
+# Development mode (with hot reload)
+npm run dev
 
-# ตรวจสอบ
-git --version
+# Custom port
+set MCP_PORT=8080 && npm start
 ```
 
-#### Linux
+## Testing the API
+
 ```bash
-# Ubuntu/De
+# Health check
+curl -X POST http://localhost:7071/health
+
+# Create entity
+curl -X POST http://localhost:7071/entities \
+  -H "Content-Type: application/json" \
+  -d '{"entities":[{"name":"Test Lab","type":"organization","observations":["AI research"]}]}'
+
+# Get stats
+curl -X POST http://localhost:7071/stats
+```
+
+## Development Commands
+
+```bash
+npm run build        # Compile TypeScript
+npm run dev          # Development with hot reload
+npm test             # Run tests
+npm run lint         # Lint TypeScript code
+npm run format       # Format code with Prettier
+npm run clean        # Clean build artifacts
+```
+
+## Project Structure
+
+```
+src/
+├── server/          # Express REST API server
+│   ├── handlers/    # API endpoint handlers
+│   ├── index.ts     # Main server class
+│   ├── router.ts    # Route definitions
+│   └── error-handler.ts
+├── types/           # TypeScript type definitions
+├── utils/           # Utilities (logger, config, validator)
+├── core/            # Core business logic (empty - to be implemented)
+├── storage/         # Data persistence (empty - to be implemented)
+└── index.ts         # Application entry point
+```
+
+## Current Status
+
+### ✅ Implemented
+- TypeScript project structure
+- Express REST API server
+- Basic entity creation (mock)
+- Health check and system info
+- Graph statistics (mock)
+- Logging and configuration
+- Input validation
+
+### 🔄 To Be Implemented
+- Data persistence (JSON files)
+- Semantic search with embeddings
+- Auto-tagging service
+- Relations between entities
+- Memory0 root node management
+- Audit logging
+- Complete test suite
+
+## Troubleshooting
+
+### Port Already in Use
+```bash
+# Check what's using port 7070
+netstat -ano | findstr :7070
+
+# Use different port
+set MCP_PORT=7071 && npm start
+```
+
+### Build Errors
+```bash
+# Clean and rebuild
+npm run clean
+npm run build
+```
+
+### Dependencies Issues
+```bash
+# Clear cache and reinstall
+npm cache clean --force
+rm -rf node_modules package-lock.json
+npm install
+```

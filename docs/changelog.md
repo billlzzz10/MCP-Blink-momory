@@ -1,1 +1,1 @@
-﻿# Changelog
+# Changelog

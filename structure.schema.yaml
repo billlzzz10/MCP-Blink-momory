@@ -1,10 +1,9 @@
-# structure.schema.yaml - สำหรับ MCP Blink Memory TypeScript Edition
+# structure.schema.yaml - เธชเธณเธซเธฃเธฑเธ MCP Blink Memory TypeScript Edition
 name: "mcp-blink-memory-structure"
 version: "2.0.0"
-description: "โครงสร้างโปรเจกต์ MCP Blink Memory แบบ TypeScript + JSON-RPC 2.0"
+description: "เนเธเธฃเธเธชเธฃเนเธฒเธเนเธเธฃเน€เธเธเธ•เน MCP Blink Memory เนเธเธ TypeScript + JSON-RPC 2.0"
 
 required_folders:
-  # 📦 โครงสร้างหลัก
   - src
   - src/server
   - src/server/handlers
@@ -12,85 +11,58 @@ required_folders:
   - src/types
   - src/storage
   - src/utils
-  
-  # 🧠 Core modules (เปลี่ยนจาก modules/ เป็น src/core/)
-  - src/core/memory-graph          # แทน modules/memory_graph
-  - src/core/embedding-service     # แทน modules/embedding_service
-  - src/core/auto-tag-service      # แทน modules/auto_tag_service
-  - src/core/memory0-service       # แทน modules/memory0_service
-  - src/core/system                # แทน modules/system
-  
-  # 💾 Data storage
+  - src/core/memory-graph
+  - src/core/embedding-service
+  - src/core/auto-tag-service
+  - src/core/memory0-service
+  - src/core/system
   - memory
-  
-  # ⚙️ Configuration
   - config
-  
-  # 📚 Documentation
   - docs
-  
-  # 🧪 Testing
   - tests
   - tests/unit
   - tests/integration
   - tests/e2e
-  
-  # 📖 Examples
   - examples
-  
-  # 🤝 GitHub
   - .github
   - .github/workflows
 
 required_files:
-  # 📦 Project configuration
   - package.json
   - tsconfig.json
-  - package-lock.json
-  
-  # 🎯 MCP Configuration (เพิ่มใหม่)
-  - manifest.json                   # MCP Manifest file
-  - config/mcp-config.yaml          # แทน config/access_policy.yaml
-  
-  # 🚀 Source code
-  - src/index.ts                    # Entry point ใหม่
+  - manifest.json
+  - config/mcp-config.yaml
+  - src/index.ts
   - src/server/index.ts
   - src/types/index.ts
-  
-  # 💾 Storage files (เดิม)
   - memory/memory_store.json
   - memory/lineage_log.json
-  - memory/embedding_cache.json     # ควรเพิ่มเพราะจำเป็น
-  - memory/tag_cache.json           # ควรเพิ่มเพราะจำเป็น
-  
-  # 📚 Documentation (เดิม)
+  - memory/embedding_cache.json
+  - memory/tag_cache.json
   - docs/audit_log.md
   - docs/legacy_clues.md
   - docs/changelog.md
-  
-  # 📖 New documentation (เพิ่มใหม่)
   - docs/api-reference.md
   - docs/migration-guide.md
   - docs/mcp-integration.md
 
 optional_folders:
-  - dist                            # 📦 Compiled output
-  - node_modules                    # 📦 Dependencies
-  - coverage                        # 📊 Test coverage
-  - schemas                         # 🏗️ JSON schemas
+  - dist
+  - node_modules
+  - coverage
+  - schemas
 
 optional_files:
-  - .env                            # 🔐 Environment variables
-  - .env.example                    # 🔐 Environment template
-  - .gitignore                      # 🤫 Git ignore
-  - README.md                       # 📖 Main documentation
-  - LICENSE                         # ⚖️ License file
-  - CONTRIBUTING.md                 # 👥 Contribution guide
-  - init.ps1                        # 🪟 Windows init script
-  - structure.schema.yaml           # 🏗️ This file itself
+  - .env
+  - .env.example
+  - .gitignore
+  - README.md
+  - LICENSE
+  - CONTRIBUTING.md
+  - init.ps1
+  - structure.schema.yaml
 
 validation_rules:
-  # 🔍 Rules for specific folders
   memory:
     description: "Data storage directory"
     writable: true
@@ -104,13 +76,11 @@ validation_rules:
     description: "TypeScript source code"
     should_exist: ["index.ts", "server/", "core/", "types/"]
   
-  # 📏 File size limits
   file_size_limits:
     memory_store.json: "10MB"
     lineage_log.json: "50MB"
     embedding_cache.json: "100MB"
     
-  # 🗂️ Required file permissions
   permissions:
     memory/: "read-write"
     config/: "read-only"

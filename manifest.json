@@ -14,7 +14,27 @@
             "entities": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/EntityInput"
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Entity name"
+                  },
+                  "type": {
+                    "type": "string",
+                    "description": "Entity type (person, organization, etc.)"
+                  },
+                  "observations": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "description": "Observations about the entity"
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "description": "Additional metadata"
+                  }
+                },
+                "required": ["name", "type"]
               },
               "description": "Array of entities to create"
             },
@@ -62,9 +82,7 @@
                 },
                 "tagFilter": {
                   "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
+                  "items": { "type": "string" },
                   "description": "Filter results by tags"
                 }
               }
@@ -73,7 +91,6 @@
           "required": ["query"]
         }
       }
-      // เพิ่ม tools อื่นๆ ตาม API ที่มี
     ],
     "resources": [
       {
@@ -104,9 +121,7 @@
         },
         "observations": {
           "type": "array",
-          "items": {
-            "type": "string"
-          },
+          "items": { "type": "string" },
           "description": "Observations about the entity"
         },
         "metadata": {

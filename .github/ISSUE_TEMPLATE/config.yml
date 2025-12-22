@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/billlzzz10/MCP-Blink-momory/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 📖 Documentation
+    url: https://github.com/billlzzz10/MCP-Blink-momory/blob/main/README.md
+    about: Read the documentation and guides
+  - name: 🔒 Security Issues
+    url: https://github.com/billlzzz10/MCP-Blink-momory/security/advisories/new
+    about: Report security vulnerabilities privately

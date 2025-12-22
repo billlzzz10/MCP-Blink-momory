@@ -1,23 +1,90 @@
-[
-  {
-    "id": "ent_db5b81a688c38a5f",
-    "type": "note",
-    "scope": "document",
-    "text": "This is a test note about hybrid search and BM25.",
-    "docHash": "doc_hash_123",
-    "tags": [
-      "testing",
-      "api"
+{
+  "entities": [
+    [
+      "ddd15fa4-06f4-4de7-986e-51dd83783fa7",
+      {
+        "id": "ddd15fa4-06f4-4de7-986e-51dd83783fa7",
+        "name": "Test Lab",
+        "type": "organization",
+        "observations": [
+          {
+            "id": "bde2cbf3-c4b1-463b-ab25-7d71b1d1bb5a",
+            "content": "AI research lab",
+            "createdAt": "2025-12-22T04:30:57.055Z"
+          }
+        ],
+        "autoTags": [],
+        "createdAt": "2025-12-22T04:30:57.055Z",
+        "updatedAt": "2025-12-22T04:30:57.055Z"
+      }
     ],
-    "createdAt": "2025-09-26T03:25:29.045Z",
-    "updatedAt": "2025-09-26T03:25:29.045Z"
-  },
-  {
-    "id": "ent_3e25d60ec3130236",
-    "type": "note",
-    "scope": "document",
-    "text": "Another item for searching.",
-    "createdAt": "2025-09-26T03:25:29.064Z",
-    "updatedAt": "2025-09-26T03:25:29.064Z"
-  }
-]
+    [
+      "6c80bf1b-7cd2-4245-943e-4c9579067b9b",
+      {
+        "id": "6c80bf1b-7cd2-4245-943e-4c9579067b9b",
+        "name": "AI Research Lab",
+        "type": "organization",
+        "observations": [
+          {
+            "id": "aa06d920-1e7d-44c1-aaee-66286787fa47",
+            "content": "Laboratory focused on artificial intelligence research",
+            "createdAt": "2025-12-22T07:00:20.873Z"
+          },
+          {
+            "id": "fc30f3f7-ed4e-4d4f-bfb5-e0419854d40e",
+            "content": "Located in Bangkok, Thailand",
+            "createdAt": "2025-12-22T07:00:20.873Z"
+          }
+        ],
+        "metadata": {
+          "autoTagConfidence": 0.8
+        },
+        "autoTags": [
+          "organization",
+          "เทคโนโลยี",
+          "ai",
+          "research",
+          "laboratory",
+          "located",
+          "bangkok,",
+          "thailand"
+        ],
+        "createdAt": "2025-12-22T07:00:20.873Z",
+        "updatedAt": "2025-12-22T07:00:20.873Z"
+      }
+    ],
+    [
+      "5044e04b-a860-4958-9dfa-7a9228187c9a",
+      {
+        "id": "5044e04b-a860-4958-9dfa-7a9228187c9a",
+        "name": "Test Entity Without Tags",
+        "type": "test",
+        "observations": [
+          {
+            "id": "85972a61-a961-41e6-8b2d-cc84c8151a84",
+            "content": "Test observation",
+            "createdAt": "2025-12-22T07:00:20.884Z"
+          }
+        ],
+        "autoTags": [],
+        "createdAt": "2025-12-22T07:00:20.884Z",
+        "updatedAt": "2025-12-22T07:00:20.884Z"
+      }
+    ]
+  ],
+  "relations": [],
+  "entityNameIndex": [
+    [
+      "Test Lab",
+      "ddd15fa4-06f4-4de7-986e-51dd83783fa7"
+    ],
+    [
+      "AI Research Lab",
+      "6c80bf1b-7cd2-4245-943e-4c9579067b9b"
+    ],
+    [
+      "Test Entity Without Tags",
+      "5044e04b-a860-4958-9dfa-7a9228187c9a"
+    ]
+  ]
+}

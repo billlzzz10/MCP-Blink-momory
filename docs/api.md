@@ -1,190 +1,169 @@
-# Memory System API Documentation
+# MCP Blink Memory API Documentation
 
-This document outlines the API endpoints for the new memory system.
+## Overview
+REST API endpoints for the MCP Blink Memory TypeScript Edition knowledge graph system.
 
-## Memory Endpoints
+**Base URL**: `http://localhost:7071`
 
-### `POST /memory/put`
+## System Endpoints
 
-Stores a single memory item.
+### `POST /health`
+Health check endpoint.
 
-**Request Body:**
-A `Memory item` JSON object. See schema below.
-
-**Example:**
+**Response:**
 ```json
 {
-  "type": "note",
-  "scope": "document",
-  "text": "This is a summary of the first three paragraphs.",
-  "docHash": "base64url_encoded_hash_of_document",
-  "tags": ["summary", "draft1"]
+  "success": true,
+  "data": {
+    "status": "healthy",
+    "timestamp": "2025-12-22T03:39:36.043Z",
+    "version": "2.0.0",
+    "uptime": 39.56
+  }
 }
 ```
 
-### `POST /memory/batch_put`
+### `POST /describe`
+Get system capabilities and information.
 
-Stores multiple memory items in a single call.
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "name": "MCP Blink Memory",
+    "version": "2.0.0",
+    "description": "Knowledge Graph Memory System with MCP Support",
+    "capabilities": {
+      "tools": [...]
+    }
+  }
+}
+```
+
+## Entity Endpoints
+
+### `POST /entities`
+Create new entities in the knowledge graph.
 
 **Request Body:**
 ```json
 {
-  "items": [
-    { "type": "note", "scope": "chat", "text": "User is asking about pricing." },
-    { "type": "decision", "scope": "board", "text": "Decided to use the new API." }
+  "entities": [
+    {
+      "name": "AI Research Lab",
+      "type": "organization",
+      "observations": ["Laboratory focused on AI research"],
+      "metadata": {}
+    }
+  ],
+  "options": {
+    "autoTag": true,
+    "linkToMemory0": true
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "count": 1,
+  "data": [
+    {
+      "id": "entity_1766374782313_0",
+      "name": "AI Research Lab",
+      "type": "organization",
+      "observations": [
+        {
+          "id": "obs_1766374782313_0",
+          "content": "Laboratory focused on AI research",
+          "createdAt": "2025-12-22T03:39:42.313Z"
+        }
+      ],
+      "autoTags": [],
+      "createdAt": "2025-12-22T03:39:42.313Z",
+      "updatedAt": "2025-12-22T03:39:42.313Z"
+    }
   ]
 }
 ```
 
-### `POST /memory/search`
+## Search Endpoints
 
-Performs a hybrid search using both keyword (BM25) and vector (cosine similarity) search.
-
-**Request Body:**
-```json
-{
-  "query": "information about the new API",
-  "topK": 5,
-  "filters": {
-    "scope": ["document", "chat"],
-    "tags": ["api", "decision"],
-    "docHash": "base64url_encoded_hash_of_document"
-  },
-  "hybrid": { "bm25": 0.5, "cosine": 0.5 }
-}
-```
-
-## Cache Endpoints
-
-### `POST /cache/get`
-
-Retrieves an item from the cache.
+### `POST /search`
+Semantic search for entities.
 
 **Request Body:**
 ```json
 {
-  "key": "model:docHash:promptHash",
-  "scope": "document"
+  "query": "artificial intelligence research",
+  "options": {
+    "topK": 5,
+    "threshold": 0.3,
+    "tagFilter": ["ai", "research"]
+  }
 }
 ```
 
-### `POST /cache/set`
-
-Adds or updates an item in the cache.
-
-**Request Body:**
-A `Cache record` JSON object. See schema below.
-
-**Example:**
+**Response:**
 ```json
 {
-  "key": "gpt4o:docHashABC:prompt123",
-  "scope": "document",
-  "output": { "text": "This is the generated summary." },
-  "usage": { "tokens_in": 250, "tokens_out": 150 },
-  "ttl_ms": 3600000
+  "success": true,
+  "count": 0,
+  "data": []
 }
 ```
 
-### `POST /cache/evict`
+## Graph Endpoints
 
-Evicts items from the cache. Can evict by a single key, a prefix, or clear an entire scope.
+### `POST /relations`
+Create relations between entities.
 
 **Request Body:**
 ```json
 {
-  "scope": "document",
-  "prefix": "gpt4o:docHashABC"
+  "relations": [
+    {
+      "from": "AI Research Lab",
+      "to": "Dr. Smith",
+      "relationType": "employs",
+      "properties": {
+        "role": "researcher",
+        "since": "2020"
+      }
+    }
+  ]
 }
 ```
 
-## Runlog Endpoint
+### `POST /stats`
+Get knowledge graph statistics.
 
-### `POST /runlog/put`
-
-Stores a single run log entry, representing one step in an AI's operation.
-
-**Request Body:**
-A `Runlog` JSON object. See schema below.
-
-**Example:**
+**Response:**
 ```json
 {
-  "phase": "generate",
-  "model": "gpt-4o",
-  "tokens_in": 250,
-  "tokens_out": 150,
-  "latency_ms": 1850,
-  "status": "ok",
-  "message": "Generated summary for document."
+  "success": true,
+  "data": {
+    "entities": 0,
+    "relations": 0,
+    "observations": 0,
+    "tags": 0,
+    "lastUpdated": "2025-12-22T03:39:48.329Z"
+  }
 }
 ```
 
-## Stats Endpoint
+## Status Codes
+- `200` - Success
+- `400` - Bad Request (validation error)
+- `500` - Internal Server Error
 
-### `POST /stats/query`
-
-Retrieves aggregated statistics about the system's operation.
-
-**Request Body:**
-```json
-{
-  "type": "token_usage"
-}
-```
-**Valid `type` values:** `token_usage`, `cache_performance`, `phase_latency`.
-
----
-
-## Data Schemas
-
-### Memory Item Schema
-```json
-{
-  "id": "string (ulid)",
-  "type": "note|decision|summary|citation|plan|state",
-  "scope": "chat|document|editor|board|workspace",
-  "text": "string",
-  "rich": { "doc": {}, "board": [] },
-  "docHash": "string (base64url)",
-  "editorHash": "string (base64url)",
-  "boardHash": "string (base64url)",
-  "tags": ["string"],
-  "links": [{"type":"ref","targetId":"ulid","weight":0.8}],
-  "vectors": {"embeddingModel":"str","vec":[0.1, ...]},
-  "meta": {
-    "model":"str","tool":"str","mcpTool":"str",
-    "tokens_in":123,"tokens_out":456,
-    "latency_ms":3210,"status":"ok|error","error":""
-  },
-  "createdAt": 1736960000000
-}
-```
-
-### Cache Record Schema
-```json
-{
-  "key": "string (model:docHash:promptHash)",
-  "scope": "chat|document|editor",
-  "output": {},
-  "usage": {"tokens_in":123,"tokens_out":456},
-  "ttl_ms": 600000,
-  "createdAt": 1736960000000,
-  "size": 20480,
-  "version": "v1"
-}
-```
-
-### Runlog Schema
-```json
-{
-  "id":"string (ulid)",
-  "phase":"retrieve|generate|apply|tool|cache_hit|cache_store|error",
-  "model":"string","mcpTool":"string",
-  "tokens_in":100,"tokens_out":250,
-  "latency_ms":1800,
-  "status":"ok|error",
-  "message":"string",
-  "createdAt":1736960000000
-}
-```
+## Current Implementation Status
+- ✅ REST API endpoints
+- ✅ Basic entity creation (mock data)
+- ✅ Health check and stats
+- 🔄 Semantic search (placeholder)
+- 🔄 Data persistence (not implemented)
+- 🔄 Auto-tagging (not implemented)
+- 🔄 Relations (mock responses)

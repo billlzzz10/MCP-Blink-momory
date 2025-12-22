@@ -1,0 +1,62 @@
+name: ❓ Question
+description: Ask a question about MCP Blink Memory
+title: "[Question] "
+labels: ["type:question", "status:needs-response"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Have a question? We're here to help! Please provide as much detail as possible.
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Question Category
+      description: What type of question is this?
+      options:
+        - Installation & Setup
+        - Configuration
+        - Usage & API
+        - Integration (Claude Desktop, Cline, etc.)
+        - Performance & Optimization
+        - Troubleshooting
+        - Development & Contributing
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What would you like to know?
+      placeholder: Ask your question here...
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Provide context about what you're trying to achieve
+      placeholder: What are you trying to do? What have you tried so far?
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment (if relevant)
+      description: Your environment details
+      placeholder: |
+        - OS: Windows 11
+        - Node.js: v20.x
+        - MCP Client: Claude Desktop
+        - Configuration: Mock embeddings
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Information
+      description: Any other relevant information
+      placeholder: Add any other details...

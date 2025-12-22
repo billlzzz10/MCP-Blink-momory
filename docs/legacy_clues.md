@@ -1,1 +1,1 @@
-﻿# Legacy Clues
+# Legacy Clues

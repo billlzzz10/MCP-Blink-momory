@@ -1,0 +1,83 @@
+# MCP Server Configuration
+server:
+  port: 7070
+  host: "0.0.0.0"
+  logLevel: "info"
+  cors:
+    enabled: true
+    origin: "*"
+    methods: ["GET", "POST", "OPTIONS"]
+    allowedHeaders: ["Content-Type", "Authorization"]
+
+features:
+  semanticSearch:
+    enabled: true
+    defaultTopK: 10
+    defaultThreshold: 0.3
+    maxQueryLength: 1000
+  
+  autoTagging:
+    enabled: true
+    defaultLanguage: "th"
+    minConfidence: 0.5
+    supportedLanguages: ["th", "en"]
+  
+  auditLogging:
+    enabled: true
+    maxLogSize: "100MB"
+    retentionDays: 30
+    logLevels: ["info", "warn", "error", "audit"]
+  
+  caching:
+    embeddings:
+      enabled: true
+      ttl: 86400  # 24 hours in seconds
+    tags:
+      enabled: true
+      ttl: 43200  # 12 hours
+
+storage:
+  memoryStorePath: "./memory/memory_store.json"
+  lineageLogPath: "./memory/lineage_log.json"
+  embeddingCachePath: "./memory/embedding_cache.json"
+  tagCachePath: "./memory/tag_cache.json"
+  backup:
+    enabled: true
+    interval: "24h"
+    maxBackups: 7
+    backupPath: "./memory/backups"
+
+security:
+  rateLimiting:
+    enabled: true
+    maxRequests: 100
+    windowMs: 900000  # 15 minutes
+  requestSizeLimit: "1mb"
+  allowedOrigins:
+    - "http://localhost:*"
+    - "http://127.0.0.1:*"
+
+embedding:
+  defaultProvider: "mock"
+  providers:
+    openai:
+      model: "text-embedding-3-small"
+      dimensions: 1536
+    huggingface:
+      model: "sentence-transformers/all-MiniLM-L6-v2"
+      dimensions: 384
+    mock:
+      dimensions: 384
+
+tagging:
+  defaultLanguage: "th"
+  tagGenerators:
+    basic:
+      enabled: true
+      maxTags: 10
+    advanced:
+      enabled: false
+      useNLP: true
+    ml:
+      enabled: false
+      modelPath: "./models/tagging-model.json"
