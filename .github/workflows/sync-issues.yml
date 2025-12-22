@@ -1,0 +1,158 @@
+# .github/workflows/sync-issues.yml
+name: "🔄 Sync Issues Status"
+
+on:
+  issues:
+    types: [opened, closed, reopened, labeled, unlabeled]
+  pull_request:
+    types: [opened, closed, reopened]
+  schedule:
+    - cron: "0 9 * * MON"  # Every Monday at 9 AM
+
+jobs:
+  sync-status:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: read
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: 📊 Update milestone progress
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Get all issues
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'all',
+              per_page: 100,
+            });
+            
+            // Group by milestone
+            const milestoneStats = {};
+            
+            for (const issue of issues.data) {
+              if (!issue.milestone) continue;
+              
+              const milestoneName = issue.milestone.title;
+              if (!milestoneStats[milestoneName]) {
+                milestoneStats[milestoneName] = {
+                  total: 0,
+                  closed: 0,
+                  open: 0,
+                };
+              }
+              
+              milestoneStats[milestoneName].total++;
+              if (issue.state === 'closed') {
+                milestoneStats[milestoneName].closed++;
+              } else {
+                milestoneStats[milestoneName].open++;
+              }
+            }
+            
+            // Log stats
+            console.log('📊 Milestone Progress:');
+            console.log('='.repeat(50));
+            
+            for (const [name, stats] of Object.entries(milestoneStats)) {
+              const percentage = Math.round((stats.closed / stats.total) * 100);
+              const progressBar = '█'.repeat(Math.floor(percentage / 5)) + 
+                                 '░'.repeat(20 - Math.floor(percentage / 5));
+              
+              console.log(`\n${name}`);
+              console.log(`Progress: [${progressBar}] ${percentage}%`);
+              console.log(`Status: ${stats.closed}/${stats.total} closed`);
+            }
+
+      - name: 📢 Create status report
+        if: github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'all',
+              per_page: 100,
+            });
+            
+            const milestoneStats = {};
+            
+            for (const issue of issues.data) {
+              if (!issue.milestone) continue;
+              
+              const milestoneName = issue.milestone.title;
+              if (!milestoneStats[milestoneName]) {
+                milestoneStats[milestoneName] = {
+                  total: 0,
+                  closed: 0,
+                  blocked: 0,
+                  inProgress: 0,
+                };
+              }
+              
+              milestoneStats[milestoneName].total++;
+              if (issue.state === 'closed') {
+                milestoneStats[milestoneName].closed++;
+              }
+              if (issue.labels.some(l => l.name === 'status:blocked')) {
+                milestoneStats[milestoneName].blocked++;
+              }
+              if (issue.labels.some(l => l.name === 'status:in-progress')) {
+                milestoneStats[milestoneName].inProgress++;
+              }
+            }
+            
+            // Create issue with status report
+            let reportBody = '# 📊 Weekly Status Report\n\n';
+            reportBody += `Generated: ${new Date().toISOString()}\n\n`;
+            reportBody += '## Milestone Progress\n\n';
+            
+            for (const [name, stats] of Object.entries(milestoneStats)) {
+              const percentage = Math.round((stats.closed / stats.total) * 100);
+              reportBody += `### ${name}\n`;
+              reportBody += `- **Progress:** ${percentage}% (${stats.closed}/${stats.total})\n`;
+              reportBody += `- **In Progress:** ${stats.inProgress}\n`;
+              reportBody += `- **Blocked:** ${stats.blocked}\n\n`;
+            }
+            
+            // Create or update issue
+            const existingReports = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              creator: 'github-actions',
+              state: 'open',
+            });
+            
+            const existingReport = existingReports.data.find(i => 
+              i.title.includes('Weekly Status Report')
+            );
+            
+            if (existingReport) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existingReport.number,
+                body: reportBody,
+              });
+              console.log(`Updated status report: #${existingReport.number}`);
+            } else {
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `📊 Weekly Status Report - ${new Date().toISOString().split('T')[0]}`,
+                body: reportBody,
+                labels: ['type:docs'],
+              });
+              console.log(`Created status report: #${created.data.number}`);
+            }

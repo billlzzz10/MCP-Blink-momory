@@ -1,0 +1,225 @@
+# .github/workflows/create-issues.yml
+name: "🤖 Auto Create GitHub Issues"
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (don't create issues)"
+        required: false
+        default: "false"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/issues-config.yaml"
+      - ".github/workflows/create-issues.yml"
+
+jobs:
+  create-issues:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: 📦 Install dependencies
+        run: npm install js-yaml
+
+      - name: 🤖 Create issues from config
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+            
+            // Load configuration
+            const configPath = '.github/issues-config.yaml';
+            const configContent = fs.readFileSync(configPath, 'utf8');
+            const config = yaml.load(configContent);
+            
+            const dryRun = '${{ github.event.inputs.dry_run }}' === 'true';
+            const createdIssues = [];
+            const skippedIssues = [];
+            
+            console.log(`📋 Processing ${config.issues.length} issues...`);
+            console.log(`🔍 Dry run: ${dryRun}`);
+            
+            // First, create all milestones
+            console.log('\n🎯 Creating milestones...');
+            const milestoneMap = {};
+            
+            for (const milestone of config.milestones) {
+              try {
+                const existingMilestones = await github.rest.issues.listMilestones({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                });
+                
+                const existing = existingMilestones.data.find(m => m.title === milestone.name);
+                
+                if (existing) {
+                  console.log(`✅ Milestone "${milestone.name}" already exists`);
+                  milestoneMap[milestone.name] = existing.number;
+                } else if (!dryRun) {
+                  const created = await github.rest.issues.createMilestone({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title: milestone.name,
+                    description: milestone.description,
+                    due_on: milestone.due_date ? new Date(milestone.due_date).toISOString() : undefined,
+                  });
+                  console.log(`✨ Created milestone: "${milestone.name}"`);
+                  milestoneMap[milestone.name] = created.data.number;
+                } else {
+                  console.log(`[DRY RUN] Would create milestone: "${milestone.name}"`);
+                  milestoneMap[milestone.name] = 0;
+                }
+              } catch (error) {
+                console.error(`❌ Error creating milestone "${milestone.name}":`, error.message);
+              }
+            }
+            
+            // Create labels
+            console.log('\n🏷️ Creating labels...');
+            for (const label of config.labels) {
+              try {
+                const existingLabels = await github.rest.issues.listLabelsForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                });
+                
+                const existing = existingLabels.data.find(l => l.name === label.name);
+                
+                if (existing) {
+                  console.log(`✅ Label "${label.name}" already exists`);
+                } else if (!dryRun) {
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: label.name,
+                    color: label.color,
+                    description: label.description,
+                  });
+                  console.log(`✨ Created label: "${label.name}"`);
+                } else {
+                  console.log(`[DRY RUN] Would create label: "${label.name}"`);
+                }
+              } catch (error) {
+                if (error.status === 422) {
+                  console.log(`✅ Label "${label.name}" already exists`);
+                } else {
+                  console.error(`❌ Error creating label "${label.name}":`, error.message);
+                }
+              }
+            }
+            
+            // Create issues
+            console.log('\n📝 Creating issues...');
+            const issueMap = {};
+            
+            for (const issue of config.issues) {
+              try {
+                // Check if issue already exists
+                const existingIssues = await github.rest.issues.listForRepo({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  state: 'all',
+                });
+                
+                const existing = existingIssues.data.find(i => i.title === issue.title);
+                
+                if (existing) {
+                  console.log(`✅ Issue "${issue.title}" already exists (#${existing.number})`);
+                  issueMap[issue.id] = existing.number;
+                  skippedIssues.push(issue.title);
+                  continue;
+                }
+                
+                if (!dryRun) {
+                  const created = await github.rest.issues.create({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    title: issue.title,
+                    body: issue.body,
+                    labels: issue.labels,
+                    milestone: milestoneMap[issue.milestone],
+                    assignees: issue.assignees,
+                  });
+                  
+                  console.log(`✨ Created issue: #${created.data.number} - ${issue.title}`);
+                  issueMap[issue.id] = created.data.number;
+                  createdIssues.push(`#${created.data.number}`);
+                } else {
+                  console.log(`[DRY RUN] Would create issue: ${issue.title}`);
+                  issueMap[issue.id] = 0;
+                }
+              } catch (error) {
+                console.error(`❌ Error creating issue "${issue.title}":`, error.message);
+              }
+            }
+            
+            // Link dependencies
+            console.log('\n🔗 Linking dependencies...');
+            for (const issue of config.issues) {
+              if (issue.depends_on && issue.depends_on.length > 0) {
+                const issueNumber = issueMap[issue.id];
+                if (!issueNumber) continue;
+                
+                for (const depId of issue.depends_on) {
+                  const depNumber = issueMap[depId];
+                  if (!depNumber) continue;
+                  
+                  try {
+                    if (!dryRun) {
+                      // Add comment with dependency link
+                      await github.rest.issues.createComment({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: issueNumber,
+                        body: `⚠️ **Depends on:** #${depNumber}`,
+                      });
+                      console.log(`✨ Linked #${issueNumber} → #${depNumber}`);
+                    } else {
+                      console.log(`[DRY RUN] Would link #${issueNumber} → #${depNumber}`);
+                    }
+                  } catch (error) {
+                    console.error(`❌ Error linking issues:`, error.message);
+                  }
+                }
+              }
+            }
+            
+            // Summary
+            console.log('\n📊 Summary:');
+            console.log(`✨ Created: ${createdIssues.length} issues`);
+            console.log(`✅ Skipped: ${skippedIssues.length} issues (already exist)`);
+            console.log(`🎯 Total milestones: ${Object.keys(milestoneMap).length}`);
+            
+            if (createdIssues.length > 0) {
+              console.log(`\n📋 Created issues: ${createdIssues.join(', ')}`);
+            }
+
+      - name: 📢 Create summary
+        if: always()
+        run: |
+          echo "## ✅ GitHub Issues Creation Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📊 Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- ✨ Issues created from configuration" >> $GITHUB_STEP_SUMMARY
+          echo "- 🎯 Milestones set up" >> $GITHUB_STEP_SUMMARY
+          echo "- 🏷️ Labels configured" >> $GITHUB_STEP_SUMMARY
+          echo "- 🔗 Dependencies linked" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📝 Next Steps" >> $GITHUB_STEP_SUMMARY
+          echo "1. Review created issues in the [Issues tab](../../issues)" >> $GITHUB_STEP_SUMMARY
+          echo "2. Assign team members to issues" >> $GITHUB_STEP_SUMMARY
+          echo "3. Start working on Phase 1 issues" >> $GITHUB_STEP_SUMMARY
