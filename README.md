@@ -101,7 +101,7 @@
 
   ```bash
   # Clone repository
-  git clone https://github.com/your-org/mcp-blink-memory.git
+  git clone https://github.com/billlzzz10/mcp-blink-memory.git
   cd mcp-blink-memory
 
   # ติดตั้ง dependencies
